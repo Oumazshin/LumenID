@@ -1,57 +1,72 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import userService from "../../api/userService";
+import { Loader2, AlertCircle, UserCircle, Mail, Phone, MapPin, GraduationCap, Globe, ShieldCheck, Wallet, Calendar, Linkedin, ExternalLink, Milestone } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
-import { 
-  UserCircle, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  GraduationCap, 
-  Globe, 
-  ShieldCheck, 
-  Wallet,
-  Calendar,
-  Linkedin,
-  ExternalLink,
-  Milestone
-} from "lucide-react";
 import { PageTransition } from "../PageTransition";
 import { twTransitions } from "../../styles/animations";
 
 export function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData] = useState({
-    fullName: "John Doe",
-    email: "john.doe@email.com",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "1995-05-15",
-    nationality: "United States",
-    address: "123 Main Street",
-    city: "San Francisco",
-    country: "USA",
-    postalCode: "94102",
-    institution: "Stanford University",
-    degree: "Bachelor of Science",
-    fieldOfStudy: "Computer Science",
-    graduationDate: "2024-05-20",
-    studentId: "STU987654",
-    linkedinUrl: "https://linkedin.com/in/johndoe",
-    portfolioUrl: "https://johndoe.com",
-    bio: "Passionate CS graduate interested in AI and machine learning.",
-    did: "did:lumen:polygon:0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-    walletAddress: "0x71C7...976F",
-    verifiedStatus: "Gold Tier",
-    memberSince: "March 2024"
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    nationality: "",
+    address: "",
+    city: "",
+    country: "",
+    postalCode: "",
+    institution: "",
+    degree: "",
+    fieldOfStudy: "",
+    graduationDate: "",
+    studentId: "",
+    linkedinUrl: "",
+    portfolioUrl: "",
+    bio: "",
+    did: "",
+    walletAddress: "",
+    verifiedStatus: "",
+    memberSince: ""
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    toast.success("Profile updated successfully!");
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      try {
+        const data = await userService.getProfile();
+        setFormData(prev => ({ ...prev, ...data }));
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      await userService.updateProfile(formData);
+      setIsEditing(false);
+      toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
@@ -59,11 +74,29 @@ export function CustomerProfile() {
     toast.info("Changes cancelled");
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <AlertCircle className="w-12 h-12 text-destructive" />
+        <p className="text-destructive font-bold">{error}</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
+
 
   return (
     <PageTransition>
-      <div className="flex flex-col gap-8 pb-12">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-12 pb-16">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div>
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
               My Profile
@@ -84,9 +117,9 @@ export function CustomerProfile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
             {/* Left Column: Digital Identity & Quick Status */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-1 space-y-8">
               <Card className={`group relative border-border/50 bg-card/40 backdrop-blur-xl overflow-hidden ${twTransitions.base}`}>
                 {/* mesh gradient header */}
                 <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-indigo-500/20 -z-10" />
@@ -94,7 +127,7 @@ export function CustomerProfile() {
                   <ShieldCheck className="w-12 h-12 text-primary" />
                 </div>
                 
-                <CardContent className="relative pt-10">
+                <CardContent className="relative pt-12 p-8">
                   <div className="flex flex-col items-center">
                     <div className="relative mb-6">
                       <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
@@ -106,7 +139,16 @@ export function CustomerProfile() {
                     </div>
 
                     <div className="text-center space-y-1 mb-6">
-                      <h2 className="text-2xl font-black tracking-tight">{formData.fullName}</h2>
+                      <h2 className="text-2xl font-black tracking-tight">
+                        {isEditing ? (
+                          <Input 
+                            name="fullName"
+                            value={formData.fullName} 
+                            onChange={handleInputChange}
+                            className="bg-background/40 border-border/50 text-center font-black h-9"
+                          />
+                        ) : formData.fullName}
+                      </h2>
                       <p className="text-xs font-bold text-primary/80 uppercase tracking-[0.2em]">{formData.fieldOfStudy}</p>
                     </div>
 
@@ -148,7 +190,7 @@ export function CustomerProfile() {
                     <CardTitle className="text-xs font-bold uppercase tracking-widest">Decentralized ID</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="p-4 rounded-xl bg-black/20 border border-white/5 break-all font-mono text-[10px] text-primary/70 leading-relaxed shadow-inner">
                     {formData.did}
                   </div>
@@ -157,7 +199,7 @@ export function CustomerProfile() {
             </div>
 
           {/* Right Column: Detailed Sections */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             <Card className="border-border/50 bg-card/40 backdrop-blur-xl">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -167,28 +209,28 @@ export function CustomerProfile() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-8 space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs uppercase tracking-wider">Full Legal Name</Label>
-                    <Input value={formData.fullName} disabled={!isEditing} className="bg-background/40 border-border/50" />
+                    <Input name="fullName" value={formData.fullName} onChange={handleInputChange} disabled={!isEditing} className="bg-background/40 border-border/50" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs uppercase tracking-wider">Email Address</Label>
-                    <Input value={formData.email} disabled={!isEditing} className="bg-background/40 border-border/50" />
+                    <Input name="email" value={formData.email} onChange={handleInputChange} disabled={!isEditing} className="bg-background/40 border-border/50" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs uppercase tracking-wider">Phone Number</Label>
-                    <Input value={formData.phone} disabled={!isEditing} className="bg-background/40 border-border/50" />
+                    <Input name="phone" value={formData.phone} onChange={handleInputChange} disabled={!isEditing} className="bg-background/40 border-border/50" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-muted-foreground text-xs uppercase tracking-wider">Nationality</Label>
-                    <Input value={formData.nationality} disabled={!isEditing} className="bg-background/40 border-border/50" />
+                    <Input name="nationality" value={formData.nationality} onChange={handleInputChange} disabled={!isEditing} className="bg-background/40 border-border/50" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-muted-foreground text-xs uppercase tracking-wider">Bio / Professional Summary</Label>
-                  <Textarea value={formData.bio} disabled={!isEditing} className="bg-background/40 border-border/50 min-h-[100px]" />
+                  <Textarea name="bio" value={formData.bio} onChange={handleInputChange} disabled={!isEditing} className="bg-background/40 border-border/50 min-h-[100px]" />
                 </div>
               </CardContent>
             </Card>
@@ -201,7 +243,7 @@ export function CustomerProfile() {
                   <CardTitle>Academic Credentials</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8">
                 <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
                   <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
                     <GraduationCap className="w-6 h-6 text-primary" />
@@ -229,7 +271,7 @@ export function CustomerProfile() {
                   <CardTitle>Professional Presence</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="grid md:grid-cols-2 gap-4">
+              <CardContent className="p-8 grid md:grid-cols-2 gap-6">
                 <a href={formData.linkedinUrl} target="_blank" rel="noopener noreferrer" 
                    className="flex items-center justify-between p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 transition-colors group">
                   <div className="flex items-center gap-3">

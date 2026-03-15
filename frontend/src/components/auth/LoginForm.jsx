@@ -68,7 +68,7 @@ export const LoginForm = ({ role = 'customer', buttonClassName = '', has2FA = fa
                 />
               )}
             </div>
-            <Button type="submit" className={`w-full ${buttonClassName}`} disabled={isLoading}>
+            <Button type="submit" className={`w-full h-12 text-base font-bold rounded-xl ${buttonClassName}`} disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>

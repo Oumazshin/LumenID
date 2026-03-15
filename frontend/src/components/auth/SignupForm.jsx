@@ -46,7 +46,11 @@ export const SignupForm = ({ buttonClassName = '', footerContent }) => {
       terms: false
     }
   });
-  const { handleSubmit, isLoading } = useAuthForm({ redirect: '/customer/profile-creation', role: 'customer' });
+  const { handleSubmit, isLoading } = useAuthForm({ 
+    redirect: '/customer/profile-creation', 
+    role: 'customer',
+    isSignup: true 
+  });
 
   return (
     <Card className={`relative border border-white/10 bg-card/10 backdrop-blur-2xl shadow-2xl overflow-hidden group`}>
@@ -55,7 +59,7 @@ export const SignupForm = ({ buttonClassName = '', footerContent }) => {
       
       <CardContent className="relative p-8 md:p-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -111,7 +115,7 @@ export const SignupForm = ({ buttonClassName = '', footerContent }) => {
                 )}
               />
             </div>
-            <Button type="submit" className={`w-full ${buttonClassName}`} disabled={isLoading}>
+            <Button type="submit" className={`w-full h-12 text-base font-bold rounded-xl ${buttonClassName}`} disabled={isLoading}>
               {isLoading ? 'Creating...' : 'Create Account'}
             </Button>
           </form>

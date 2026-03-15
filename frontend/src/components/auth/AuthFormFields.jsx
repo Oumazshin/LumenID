@@ -11,8 +11,8 @@ export const EmailInput = ({ label = 'Email Address', icon, ...props }) => (
   <FormItem className="space-y-1.5">
     <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">{label}</FormLabel>
     <div className="relative group">
-      <div className="absolute inset-0 bg-primary/5 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
-      {icon || <Mail className="absolute left-4 top-[0.7rem] h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />}
+      <div className="absolute inset-0 bg-primary/5 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+      {icon || <Mail className="absolute left-4 top-[0.7rem] h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors pointer-events-none" />}
       <FormControl>
         <Input 
           className="h-12 pl-12 bg-white/[0.03] border-white/10 focus:border-primary/50 focus:ring-0 rounded-xl placeholder:text-muted-foreground/20 transition-all shadow-inner" 
@@ -35,8 +35,8 @@ export const PasswordInput = ({ label = 'Password', ...props }) => {
     <FormItem className="space-y-1.5">
       <FormLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">{label}</FormLabel>
       <div className="relative group">
-        <div className="absolute inset-0 bg-primary/5 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity" />
-        <Lock className="absolute left-4 top-[0.7rem] h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+        <div className="absolute inset-0 bg-primary/5 rounded-xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+        <Lock className="absolute left-4 top-[0.7rem] h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors pointer-events-none" />
         <FormControl>
           <Input 
             type={showPassword ? 'text' : 'password'}
@@ -105,7 +105,7 @@ export const VerificationCodeInput = ({ ...props }) => (
     </div>
     <FormControl>
       <div className="relative group">
-        <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
         <Input 
           className="h-16 bg-black/40 border-primary/20 focus:border-primary focus:ring-1 focus:ring-primary/20 rounded-2xl font-mono text-center tracking-[0.6em] text-2xl text-primary font-black shadow-2xl transition-all"
           placeholder="000000"

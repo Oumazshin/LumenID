@@ -24,46 +24,41 @@ import {
 import { twTransitions } from "../../styles/animations";
 import { useNavigate } from "react-router";
 
+import { useEffect, useState } from "react";
+import adminService from "../../api/adminService";
+
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const stats = useMemo(() => [
-    {
-      icon: MintCredentialIcon,
-      label: "Credentials Issued",
-      value: "2,847",
-      change: "+12%",
-      gradient: "from-violet-500 to-purple-500",
-      bgClass: "bg-violet-500/10",
-      textClass: "text-violet-500"
-    },
-    {
-      icon: CheckCircle2,
-      label: "Verifications Today",
-      value: "1,394",
-      change: "+8%",
-      gradient: "from-green-500 to-emerald-500",
-      bgClass: "bg-emerald-500/10",
-      textClass: "text-emerald-500"
-    },
-    {
-      icon: Clock,
-      label: "Pending Reviews",
-      value: "23",
-      change: "-5%",
-      gradient: "from-yellow-500 to-amber-500",
-      bgClass: "bg-amber-500/10",
-      textClass: "text-amber-500"
-    },
-    {
-      icon: Users,
-      label: "Active Users",
-      value: "15,429",
-      change: "+18%",
-      gradient: "from-cyan-500 to-blue-500",
-      bgClass: "bg-cyan-500/10",
-      textClass: "text-cyan-500"
-    },
-  ], []);
+  const [stats, setStats] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const iconMap = {
+    MintCredentialIcon,
+    CheckCircle2,
+    Clock,
+    Users
+  };
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setIsLoading(true);
+      try {
+        const data = await adminService.getStats();
+        // Map icon components if they come as strings from API
+        const mappedStats = data.map(stat => ({
+          ...stat,
+          icon: iconMap[stat.iconName] || stat.icon || Activity
+        }));
+        setStats(mappedStats);
+      } catch (error) {
+        console.error("Failed to fetch admin stats", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const quickActions = useMemo(() => [
     {
@@ -98,9 +93,9 @@ export function AdminDashboard() {
 
   return (
     <PageTransition>
-      <div className="flex flex-col gap-8 w-full pb-16">
+      <div className="flex flex-col gap-12 w-full pb-16">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/40 border border-border/50 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-card/40 border border-border/50 rounded-3xl p-8 md:p-10 backdrop-blur-xl shadow-sm">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
               Admin Command Center
@@ -119,37 +114,43 @@ export function AdminDashboard() {
 
         {/* Stats Section */}
         <StaggerContainer>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
-            {stats.map((stat, i) => {
-              const Icon = stat.icon;
-              const isPositive = stat.change.startsWith('+');
-              return (
-                <StaggerItem key={stat.label} delay={i * 100}>
-                  <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-primary/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className={`w-12 h-12 ${stat.bgClass} rounded-xl flex items-center justify-center ${stat.textClass} group-hover:scale-110 transition-all duration-300`}>
-                          <Icon className="w-6 h-6" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+            {isLoading ? (
+              Array(4).fill(0).map((_, i) => (
+                <div key={i} className="h-44 rounded-2xl bg-card/20 animate-pulse border border-border/30" />
+              ))
+            ) : (
+              stats.map((stat, i) => {
+                const Icon = stat.icon;
+                const isPositive = stat.change.startsWith('+');
+                return (
+                  <StaggerItem key={stat.label} delay={i * 100}>
+                    <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-primary/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
+                      <CardContent className="p-8">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className={`w-12 h-12 ${stat.bgClass} rounded-xl flex items-center justify-center ${stat.textClass} group-hover:scale-110 ${twTransitions.base}`}>
+                            <Icon className="w-6 h-6" />
+                          </div>
+                          <Badge 
+                            variant="outline" 
+                            className={`rounded-lg px-2.5 py-0.5 text-xs font-semibold ${isPositive ? 'text-green-500 border-green-500/30 bg-green-500/10' : 'text-red-500 border-red-500/30 bg-red-500/10'}`}
+                          >
+                            {stat.change}
+                          </Badge>
                         </div>
-                        <Badge 
-                          variant="outline" 
-                          className={`rounded-lg px-2.5 py-0.5 text-xs font-semibold ${isPositive ? 'text-green-500 border-green-500/30 bg-green-500/10' : 'text-red-500 border-red-500/30 bg-red-500/10'}`}
-                        >
-                          {stat.change}
-                        </Badge>
-                      </div>
-                      <p className="text-4xl font-black text-foreground mb-1 tracking-tight">{stat.value}</p>
-                      <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-                    </CardContent>
-                  </Card>
-                </StaggerItem>
-              );
-            })}
+                        <p className="text-4xl font-black text-foreground mb-1 tracking-tight">{stat.value}</p>
+                        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                      </CardContent>
+                    </Card>
+                  </StaggerItem>
+                );
+              })
+            )}
           </div>
         </StaggerContainer>
 
         {/* Portals / Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-8">
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
@@ -163,7 +164,7 @@ export function AdminDashboard() {
                 <CardHeader className="p-8 pb-4">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-2">
                     <div className="flex items-start gap-5">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${action.gradient} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-500`}>
+                      <div className={`w-16 h-16 bg-gradient-to-br ${action.gradient} rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 ${twTransitions.slow}`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="flex-1 min-w-0 mt-1">

@@ -20,7 +20,7 @@ import { useCredentials } from "../../hooks/useCredentials";
 import { twTransitions } from "../../styles/animations";
 
 export function CustomerDashboard() {
-  const { data: credentials, isLoading, error } = useCredentials("current-user");
+  const { data: credentials, isLoading, error } = useCredentials();
   const [selectedCredential, setSelectedCredential] = useState(null);
 
   const stats = useMemo(() => ({
@@ -80,7 +80,7 @@ export function CustomerDashboard() {
               <Card className={`group border-border/50 bg-card/40 backdrop-blur-xl ${twTransitions.cardHover} cursor-pointer`}>
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                    <div className={`w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 ${twTransitions.base}`}>
                       <FileText className="w-6 h-6" />
                     </div>
                   </div>
@@ -94,7 +94,7 @@ export function CustomerDashboard() {
               <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-success/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center text-success group-hover:scale-110 group-hover:bg-success/20 transition-all duration-300">
+                    <div className={`w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center text-success group-hover:scale-110 group-hover:bg-success/20 ${twTransitions.base}`}>
                       <CheckCircle2 className="w-6 h-6" />
                     </div>
                   </div>
@@ -108,7 +108,7 @@ export function CustomerDashboard() {
               <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-warning/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center text-warning group-hover:scale-110 group-hover:bg-warning/20 transition-all duration-300">
+                    <div className={`w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center text-warning group-hover:scale-110 group-hover:bg-warning/20 ${twTransitions.base}`}>
                       <Clock className="w-6 h-6" />
                     </div>
                   </div>
@@ -122,7 +122,7 @@ export function CustomerDashboard() {
               <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-destructive/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center text-destructive group-hover:scale-110 group-hover:bg-destructive/20 transition-all duration-300">
+                    <div className={`w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center text-destructive group-hover:scale-110 group-hover:bg-destructive/20 ${twTransitions.base}`}>
                       <AlertCircle className="w-6 h-6" />
                     </div>
                   </div>

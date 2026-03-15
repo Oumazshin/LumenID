@@ -8,7 +8,7 @@ import {
   TrustTriangle,
 } from "./icons/LumenIcons";
 import { LogIn, UserPlus, ShieldCheck } from "lucide-react";
-import { twTransitions } from "../styles/animations";
+import { twTransitions, fadeScale, fadeInUp, staggerContainerVariants, staggerItemVariants } from "../styles/animations";
 import { motion } from "framer-motion";
 
 export function LandingPage() {
@@ -39,12 +39,12 @@ export function LandingPage() {
   ];
 
   return (
-    <div className="flex items-center justify-center py-8 md:py-16">
-      <div className="max-w-4xl w-full mx-auto text-center flex flex-col gap-16">
+    <div className="flex items-center justify-center py-12 md:py-24">
+      <div className="max-w-5xl w-full mx-auto text-center flex flex-col gap-24 px-4 sm:px-6 lg:px-8">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          variants={fadeScale}
+          initial="initial"
+          animate="animate"
           className="flex flex-col gap-6"
         >
           <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-2xl mt-8">
@@ -58,16 +58,19 @@ export function LandingPage() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full px-4">
-          {features.map((feature, i) => {
+        <motion.div 
+          variants={staggerContainerVariants}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {features.map((feature) => {
             const Icon = feature.icon;
             return (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
+                variants={staggerItemVariants}
                 className={`p-8 rounded-3xl bg-card/40 backdrop-blur-2xl border border-border/40 ${twTransitions.cardHover} group relative overflow-hidden`}
               >
                 {/* Subtle background glow on card hover */}
@@ -84,9 +87,15 @@ export function LandingPage() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col items-center mt-4 relative px-4">
+        <motion.div 
+          variants={fadeInUp}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={{ once: true }}
+          className="flex flex-col items-center mt-8 relative"
+        >
           {/* Subtle background glow for the whole diagram */}
           <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full -z-10" />
           
@@ -102,9 +111,9 @@ export function LandingPage() {
           <p className="mt-6 text-sm text-muted-foreground/60 max-w-md mx-auto italic">
             A secure ecosystem where identity is sovereign and verification is instant.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center py-2 -mt-4">
+        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center py-4">
           <Button
             size="lg"
             onClick={() => navigate("/auth/role-selection")}
@@ -134,7 +143,13 @@ export function LandingPage() {
               Quick Access Portals
             </p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl px-4">
+            <motion.div 
+              variants={staggerContainerVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl"
+            >
               {[
                 { 
                   label: "Customer Login", 
@@ -160,13 +175,10 @@ export function LandingPage() {
                   border: "hover:border-violet-500/30",
                   text: "text-violet-400"
                 }
-              ].map((item, i) => (
+              ].map((item) => (
                 <motion.button
                   key={item.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  viewport={{ once: true }}
+                  variants={staggerItemVariants}
                   onClick={() => navigate(item.path)}
                   className={`flex flex-col items-center gap-3 p-6 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/50 ${item.border} ${item.bg} ${twTransitions.base} group ${twTransitions.buttonHover}`}
                 >
@@ -178,7 +190,7 @@ export function LandingPage() {
                   </span>
                 </motion.button>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

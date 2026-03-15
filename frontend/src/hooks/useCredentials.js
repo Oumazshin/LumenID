@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockCredentials } from '../data/mockData';
+import credentialService from '../api/credentialService';
 
-export function useCredentials(userId) {
+export function useCredentials() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,17 +10,14 @@ export function useCredentials(userId) {
     setIsLoading(true);
     setError(null);
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
-      // In a real app, you would fetch based on userId
-      setData(mockCredentials);
+      const result = await credentialService.getCredentials();
+      setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch credentials');
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     fetchCredentials();

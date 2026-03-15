@@ -1,4 +1,5 @@
 import * as React from "react";
+import authService from "../api/authService";
 
 // Context initialization without TypeScript generics
 const AuthContext = React.createContext(undefined);
@@ -7,50 +8,44 @@ export function AuthProvider({ children }) {
   const [user, setUser] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  // Initialize auth state from sessionStorage on mount
+  // Initialize auth state on mount
   React.useEffect(() => {
-    const initAuth = () => {
-      try {
-        const storedAuth = sessionStorage.getItem("auth");
-        if (storedAuth) {
-          const parsedAuth = JSON.parse(storedAuth);
-          setUser(parsedAuth.user);
+    const initAuth = async () => {
+      const token = localStorage.getItem("lumen_auth_token");
+      if (token) {
+        try {
+          const userData = await authService.getCurrentUser();
+          setUser(userData);
+        } catch {
+          authService.logout();
+          setUser(null);
         }
-      } catch {
-        sessionStorage.removeItem("auth");
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
 
     initAuth();
   }, []);
 
-  // Persist auth state to sessionStorage whenever it changes
-  React.useEffect(() => {
-    if (user) {
-      sessionStorage.setItem("auth", JSON.stringify({ user }));
-    } else {
-      sessionStorage.removeItem("auth");
-    }
-  }, [user]);
-
   const login = React.useCallback(
     async (email, password, role) => {
       setIsLoading(true);
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const data = await authService.login({ email, password, role });
+        setUser(data.user);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
-        // Mock authentication
-        const mockUser = {
-          id: `user-${Date.now()}`,
-          email,
-          role,
-          name: email.split("@")[0],
-        };
-
-        setUser(mockUser);
+  const signup = React.useCallback(
+    async (userData) => {
+      setIsLoading(true);
+      try {
+        const data = await authService.signup(userData);
+        setUser(data.user);
       } finally {
         setIsLoading(false);
       }
@@ -59,8 +54,8 @@ export function AuthProvider({ children }) {
   );
 
   const logout = React.useCallback(() => {
+    authService.logout();
     setUser(null);
-    sessionStorage.removeItem("auth");
   }, []);
 
   const value = React.useMemo(
@@ -69,10 +64,11 @@ export function AuthProvider({ children }) {
       isAuthenticated: !!user,
       isLoading,
       login,
+      signup,
       logout,
       setUser,
     }),
-    [user, isLoading, login, logout]
+    [user, isLoading, login, signup, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
