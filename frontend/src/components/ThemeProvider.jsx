@@ -14,15 +14,41 @@ export function ThemeProvider({
   storageKey = "lumenid-theme",
   ...props
 }) {
-  const [theme, setTheme] = React.useState(
-    () => {
-      try {
-        return localStorage.getItem(storageKey) || defaultTheme;
-      } catch {
-        return defaultTheme;
-      }
+  const [theme, setTheme] = React.useState(() => {
+    // Check system preference first, then localStorage, then default
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
     }
-  );
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    try {
+      return localStorage.getItem(storageKey) || defaultTheme;
+    } catch {
+      return defaultTheme;
+    }
+  });
+
+  // Listen for system theme changes
+  React.useEffect(() => {
+    const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)');
+
+    const handleSystemChange = () => {
+      if (!localStorage.getItem(storageKey)) {
+        // Only change if no user preference saved
+        setTheme(mediaQueryDark.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQueryDark.addListener(handleSystemChange);
+    mediaQueryLight.addListener(handleSystemChange);
+
+    return () => {
+      mediaQueryDark.removeListener(handleSystemChange);
+      mediaQueryLight.removeListener(handleSystemChange);
+    };
+  }, [storageKey]);
 
   React.useEffect(() => {
     const root = window.document.documentElement;

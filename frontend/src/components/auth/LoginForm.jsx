@@ -29,7 +29,7 @@ const verifierSchema = loginSchema.extend({
   verificationCode: z.string().regex(/^\d{6}$/, 'Must be 6 digits')
 });
 
-export const LoginForm = ({ role = 'customer', className = '', has2FA = false, headerContent, footerContent }) => {
+export const LoginForm = ({ role = 'customer', buttonClassName = '', has2FA = false, headerContent, footerContent }) => {
   const schema = has2FA ? verifierSchema : loginSchema;
   const form = useForm({
     resolver: zodResolver(schema),
@@ -41,30 +41,31 @@ export const LoginForm = ({ role = 'customer', className = '', has2FA = false, h
   });
 
   return (
-    <Card className={`border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl ${className}`}>
+    <Card className={`border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl`}>
       <CardContent className="pt-6">
+        {headerContent}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
-                render={() => <EmailInput control={form.control} />}
+                render={({ field }) => <EmailInput {...field} />}
               />
               <FormField
                 control={form.control}
                 name="password"
-                render={() => <PasswordInput control={form.control} />}
+                render={({ field }) => <PasswordInput {...field} />}
               />
               {has2FA && (
                 <FormField
                   control={form.control}
                   name="verificationCode"
-                  render={() => <VerificationCodeInput control={form.control} />}
+                  render={({ field }) => <VerificationCodeInput {...field} />}
                 />
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className={`w-full ${buttonClassName}`} disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>

@@ -1,4 +1,7 @@
+/* Global base styles */
+
 @import './fonts.css';
-@import './tailwind.css';
+@import "tailwindcss";
 @import './theme.css';
 @import './layout-geometry.css';
+

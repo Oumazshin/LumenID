@@ -1,31 +1,15 @@
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { HolderIcon, VerifierIcon, IssuerIcon } from "../icons/LumenIcons";
+import { twTransitions } from "../../styles/animations";
 
 export function RoleSelection() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Handle going back - use router history or fallback to home
+  // Handle going back - always go to home
   const handleGoBack = () => {
-    // Check if there's a state from property (redirected from protected route)
-    const from = location.state?.from;
-    
-    // If navigating from a protected route, go to home
-    if (from) {
-      navigate("/", { replace: true });
-      return;
-    }
-    
-    // Otherwise, try to go back in history
-    // If no history, go to home
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/", { replace: true });
-    }
+    navigate("/");
   };
 
   const roles = [
@@ -62,12 +46,12 @@ export function RoleSelection() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 relative">
+    <div className="flex items-center justify-center py-8 md:py-16 relative">
       {/* Back Button */}
       <Button 
         onClick={handleGoBack}
-        variant="ghost" 
-        className="absolute top-4 left-4 sm:top-8 sm:left-8 text-muted-foreground hover:text-foreground"
+        variant="outline" 
+        className={`absolute top-4 left-4 sm:top-8 sm:left-8 text-muted-foreground hover:text-foreground border-border/50 bg-background/50 backdrop-blur-xl ${twTransitions.buttonHover}`}
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back
@@ -101,11 +85,11 @@ export function RoleSelection() {
               <Card 
                 key={role.type}
                 className={`
-                  border border-border/50 bg-card/60 backdrop-blur-xl relative overflow-hidden group ${styles.hoverBorder} transition-all duration-300
+                  border border-border/50 bg-card/60 backdrop-blur-xl relative overflow-hidden group ${styles.hoverBorder} ${twTransitions.cardHover}
                 `}
               >
                 {/* Background glow effect on hover */}
-                <div className={`absolute -inset-0.5 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500`} />
+                <div className={`absolute -inset-0.5 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-10 blur-xl ${twTransitions.slow}`} />
                 
                 <CardHeader className="relative z-10 p-8">
                   <div className="flex items-center gap-5 mb-4">
@@ -135,7 +119,7 @@ export function RoleSelection() {
                 <CardContent className="relative z-10 p-8 pt-0">
                   <Button
                     onClick={() => navigate(role.path)}
-                    className={`w-full bg-gradient-to-r ${role.gradient} hover:opacity-90 text-white border-0 shadow-lg shadow-primary/20 h-12 text-base font-semibold group/btn transition-all`}
+                    className={`w-full bg-gradient-to-r ${role.gradient} hover:opacity-90 text-white border-0 shadow-lg shadow-primary/20 h-12 text-base font-semibold group/btn ${twTransitions.buttonHover}`}
                   >
                     Continue as {role.title}
                     <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" />

@@ -1,9 +1,9 @@
-import { Badge } from '../components/ui/badge.js';
+import { Badge } from '../components/ui/badge.jsx';
 
 /**
  * Status badge component - reusable
  * @param {string} status - 'pending'|'verified'|'rejected'|'expired'
- * @param {ReactNode} [children] - optional content
+ * @param {React.ReactNode} [children] - optional content
  */
 export const StatusBadge = ({ status, children, ...props }) => {
   const variants = {

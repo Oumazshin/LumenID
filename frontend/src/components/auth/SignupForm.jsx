@@ -34,7 +34,7 @@ const signupSchema = z.object({
   path: ['terms']
 });
 
-export const SignupForm = ({ className = '', footerContent }) => {
+export const SignupForm = ({ buttonClassName = '', footerContent }) => {
   const form = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -49,7 +49,7 @@ export const SignupForm = ({ className = '', footerContent }) => {
   const { handleSubmit, isLoading } = useAuthForm({ redirect: '/customer/profile-creation', role: 'customer' });
 
   return (
-    <Card className={`border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl ${className}`}>
+    <Card className={`border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl`}>
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -57,29 +57,29 @@ export const SignupForm = ({ className = '', footerContent }) => {
               <FormField
                 control={form.control}
                 name="fullName"
-                render={() => <NameInput control={form.control} />}
+                render={({ field }) => <NameInput {...field} />}
               />
               <FormField
                 control={form.control}
                 name="phone"
-                render={() => <PhoneInput control={form.control} />}
+                render={({ field }) => <PhoneInput {...field} />}
               />
             </div>
             <FormField
               control={form.control}
               name="email"
-              render={() => <EmailInput control={form.control} />}
+              render={({ field }) => <EmailInput {...field} />}
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="password"
-                render={() => <PasswordInput control={form.control} label="Password" />}
+                render={({ field }) => <PasswordInput {...field} label="Password" />}
               />
               <FormField
                 control={form.control}
                 name="confirmPassword"
-                render={() => <PasswordInput control={form.control} label="Confirm Password" />}
+                render={({ field }) => <PasswordInput {...field} label="Confirm Password" />}
               />
             </div>
             <div className="flex items-start">
@@ -108,7 +108,7 @@ export const SignupForm = ({ className = '', footerContent }) => {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className={`w-full ${buttonClassName}`} disabled={isLoading}>
               {isLoading ? 'Creating...' : 'Create Account'}
             </Button>
           </form>

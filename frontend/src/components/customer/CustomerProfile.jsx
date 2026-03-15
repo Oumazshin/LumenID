@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -7,16 +7,13 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import { UserCircle, Mail, Phone, MapPin, GraduationCap, Globe } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
 import { PageTransition } from "../PageTransition";
 
 export function CustomerProfile() {
-  const navigate = useNavigate();
-  const { logout, user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData] = useState({
     fullName: "John Doe",
-    email: user?.email || "john.doe@email.com",
+    email: "john.doe@email.com",
     phone: "+1 (555) 123-4567",
     dateOfBirth: "1995-05-15",
     nationality: "United States",
@@ -44,11 +41,6 @@ export function CustomerProfile() {
     toast.info("Changes cancelled");
   };
 
-  const handleLogout = () => {
-    logout();
-    toast.success("Logged out successfully");
-    navigate("/auth/role-selection");
-  };
 
   return (
     <PageTransition>

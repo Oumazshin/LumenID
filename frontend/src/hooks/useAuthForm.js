@@ -33,7 +33,7 @@ export const useAuthForm = ({ redirect, role = 'customer', logout = false }) => 
         navigate(redirect);
         setIsLoading(false);
       }, 500);
-    } catch (error) {
+    } catch {
       toast.error(logout ? 'Logout failed' : 'Authentication failed. Please try again.');
       setIsLoading(false);
     }

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
-import { Card, CardContent } from '../ui/card';
+
 import { LoginForm } from './LoginForm';
+import { Button } from '../ui/button';
 
 const restrictedBanner = (
   <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 mb-6">
@@ -32,7 +33,7 @@ const footerContent = (
 
 export function VerifierLogin() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-8 md:py-16">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20">
@@ -46,22 +47,20 @@ export function VerifierLogin() {
           </p>
         </div>
 
-        <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl">
-          <CardContent className="pt-6">
-            {restrictedBanner}
-            <LoginForm 
-              role="verifier" 
-              has2FA={true}
-              className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-white border-0 shadow-lg"
-              footerContent={footerContent}
-            />
-          </CardContent>
-        </Card>
+        <LoginForm 
+          role="verifier" 
+          has2FA={true}
+          buttonClassName="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-white border-0 shadow-lg text-center"
+          headerContent={restrictedBanner}
+          footerContent={footerContent}
+        />
 
         <div className="text-center">
-          <Link to="/auth/role-selection" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            ← Back to role selection
-          </Link>
+          <Button variant="outline" className="w-full text-muted-foreground hover:text-primary transition-colors border-border/50 bg-background/50 backdrop-blur-xl" asChild>
+            <Link to="/auth/role-selection">
+              ← Back to role selection
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ export function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+    <div className="flex items-center justify-center py-12 md:py-24">
       <div className="max-w-2xl w-full text-center space-y-8">
         <div className="relative">
           <div className="text-[12rem] md:text-[16rem] font-extrabold leading-none bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-20 select-none">
@@ -48,27 +48,28 @@ export function NotFoundPage() {
 
         <div className="pt-8 border-t border-border/30">
           <p className="text-sm text-muted-foreground mb-4">Quick Links</p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <button
+          <div className="flex flex-wrap justify-center gap-4 text-sm w-full max-w-md mx-auto">
+            <Button
+              variant="outline"
               onClick={() => navigate("/auth/customer/login")}
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
+              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
             >
               Customer Login
-            </button>
-            <span className="text-muted-foreground/40">•</span>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => navigate("/auth/verifier/login")}
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
+              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
             >
               Verifier Login
-            </button>
-            <span className="text-muted-foreground/40">•</span>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => navigate("/auth/role-selection")}
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
+              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10 sm:col-span-2"
             >
               Get Started
-            </button>
+            </Button>
           </div>
         </div>
       </div>

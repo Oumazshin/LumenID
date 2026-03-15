@@ -9,7 +9,12 @@
  * - All icons use `currentColor` for theme compatibility
  */
 
+
+
 import { motion } from "framer-motion";
+import { staggerItemVariants } from "../../styles/animations";
+
+// ──────────────────────────────────────────────────────────────
 
 // ──────────────────────────────────────────────────────────────
 // TRUST TRIANGLE: ROLE ICONS
@@ -287,13 +292,16 @@ export function TrustTriangle({ className = "", size = "md" }) {
   ];
 
   return (
-    <div className={`flex items-center justify-center gap-8 ${className}`}>
+    <motion.div 
+      initial="initial"
+      animate="animate"
+      className={`flex items-center justify-center gap-8 ${className}`}
+    >
       {roles.map(({ Icon, label, sublabel, gradient, glow, ring }, i) => (
         <motion.div
           key={label}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1, duration: 0.4 }}
+          variants={staggerItemVariants}
+          custom={i}
           className="flex flex-col items-center gap-3"
         >
           <div
@@ -307,6 +315,6 @@ export function TrustTriangle({ className = "", size = "md" }) {
           </div>
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

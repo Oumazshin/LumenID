@@ -7,7 +7,7 @@ import { FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '
 /**
  * Reusable Email Input for auth forms
  */
-export const EmailInput = ({ control, name = 'email', label = 'Email Address', icon, ...props }) => (
+export const EmailInput = ({ label = 'Email Address', icon, ...props }) => (
   <FormItem>
     <FormLabel>{label}</FormLabel>
     <div className="relative">
@@ -23,7 +23,7 @@ export const EmailInput = ({ control, name = 'email', label = 'Email Address', i
 /**
  * Reusable Password Input with toggle
  */
-export const PasswordInput = ({ control, name = 'password', label = 'Password', ...props }) => {
+export const PasswordInput = ({ label = 'Password', ...props }) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   return (
@@ -54,7 +54,7 @@ export const PasswordInput = ({ control, name = 'password', label = 'Password', 
 /**
  * Phone Input
  */
-export const PhoneInput = ({ control, name = 'phone', ...props }) => (
+export const PhoneInput = ({ ...props }) => (
   <FormItem>
     <FormLabel>Phone Number</FormLabel>
     <div className="relative">
@@ -70,7 +70,7 @@ export const PhoneInput = ({ control, name = 'phone', ...props }) => (
 /**
  * Full Name Input
  */
-export const NameInput = ({ control, name = 'fullName', ...props }) => (
+export const NameInput = ({ ...props }) => (
   <FormItem>
     <FormLabel>Full Name</FormLabel>
     <div className="relative">
@@ -86,7 +86,7 @@ export const NameInput = ({ control, name = 'fullName', ...props }) => (
 /**
  * 2FA Code Input (Verifier specific)
  */
-export const VerificationCodeInput = ({ control, name = 'verificationCode', ...props }) => (
+export const VerificationCodeInput = ({ ...props }) => (
   <FormItem>
     <FormLabel>2FA Code</FormLabel>
     <FormControl>

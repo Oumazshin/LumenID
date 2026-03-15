@@ -12,25 +12,7 @@ import { PageTransition } from "../PageTransition";
 export function ProfileCreation() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [secretPhraseCopied, setSecretPhraseCopied] = useState(false);
-  const [secretPhraseConfirmed, setSecretPhraseConfirmed] = useState(false);
-  
-  const [secretPhrase] = useState(() => {
-    const words = [
-      "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract",
-      "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid",
-      "acoustic", "acquire", "across", "act", "action", "actor", "actress", "actual",
-      "adapt", "add", "addict", "address", "adjust", "admit", "adult", "advance",
-      "advice", "aerobic", "affair", "afford", "afraid", "again", "age", "agent",
-      "agree", "ahead", "aim", "air", "airport", "aisle", "alarm", "album"
-    ];
-    const phrase = [];
-    for (let i = 0; i < 12; i++) {
-      phrase.push(words[Math.floor(Math.random() * words.length)]);
-    }
-    return phrase;
-  });
-  
+
   const [formData, setFormData] = useState({
     dateOfBirth: "",
     nationality: "",
@@ -60,11 +42,7 @@ export function ProfileCreation() {
     { number: 5, title: "Secret Phrase", icon: Shield }
   ];
 
-  const handleFileChange = (e, field) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, [field]: e.target.files[0] });
-    }
-  };
+
 
   const handleNext = () => {
     if (currentStep < 4) {
@@ -82,17 +60,9 @@ export function ProfileCreation() {
     setCurrentStep(5);
   };
 
-  const handleCopySecretPhrase = () => {
-    navigator.clipboard.writeText(secretPhrase.join(" "));
-    setSecretPhraseCopied(true);
-    toast.success("Secret phrase copied to clipboard!");
-  };
+
 
   const handleConfirmAndFinish = () => {
-    if (!secretPhraseConfirmed) {
-      toast.error("Please confirm that you have saved your secret phrase");
-      return;
-    }
     toast.success("Profile created successfully! Redirecting to dashboard...");
     setTimeout(() => {
       navigate("/customer/dashboard");
@@ -101,8 +71,8 @@ export function ProfileCreation() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen py-grid-12 px-grid-4 sm:px-grid-6 lg:px-grid-8">
-        <div className="max-w-4xl mx-auto flex flex-col gap-8">
+      <div className="flex flex-col items-center justify-center w-full">
+        <div className="max-w-4xl w-full flex flex-col gap-8">
           <div className="text-center mt-8 flex flex-col items-center gap-4">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
               Create Your Profile
@@ -226,11 +196,10 @@ export function ProfileCreation() {
                       Complete Profile
                     </Button>
                   ) : (
-                    <Button
+                      <Button
                       type="button"
                       onClick={handleConfirmAndFinish}
                       className="flex-1 h-12 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white border-0 shadow-lg shadow-green-500/30"
-                      disabled={!secretPhraseConfirmed}
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       Confirm & Finish

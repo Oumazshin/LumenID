@@ -18,7 +18,7 @@ export function AccessDeniedPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+    <div className="flex items-center justify-center py-12 md:py-24">
       <div className="max-w-2xl w-full text-center space-y-8">
         <div className="relative flex justify-center">
           <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/20 via-orange-500/20 to-yellow-500/20 backdrop-blur-xl rounded-full border border-red-500/30 flex items-center justify-center">

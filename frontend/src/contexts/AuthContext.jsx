@@ -16,8 +16,7 @@ export function AuthProvider({ children }) {
           const parsedAuth = JSON.parse(storedAuth);
           setUser(parsedAuth.user);
         }
-      } catch (error) {
-        console.error("Failed to parse auth data:", error);
+      } catch {
         sessionStorage.removeItem("auth");
       } finally {
         setIsLoading(false);
@@ -52,8 +51,6 @@ export function AuthProvider({ children }) {
         };
 
         setUser(mockUser);
-      } catch (error) {
-        throw error;
       } finally {
         setIsLoading(false);
       }

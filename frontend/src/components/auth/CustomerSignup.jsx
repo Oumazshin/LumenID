@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { UserCircle } from 'lucide-react';
-import { Card, CardContent } from '../ui/card';
+
 import { SignupForm } from './SignupForm';
+import { Button } from '../ui/button';
 
 const footerContent = (
   <>
@@ -25,7 +26,7 @@ const footerContent = (
 
 export function CustomerSignup() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-8 md:py-16">
       <div className="w-full max-w-xl space-y-8">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
@@ -39,19 +40,17 @@ export function CustomerSignup() {
           </p>
         </div>
 
-        <Card className="border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl">
-          <CardContent className="pt-6">
-            <SignupForm 
-              className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:opacity-90 text-white border-0 shadow-lg"
-              footerContent={footerContent}
-            />
-          </CardContent>
-        </Card>
+        <SignupForm 
+          buttonClassName="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:opacity-90 text-white border-0 shadow-lg"
+          footerContent={footerContent}
+        />
 
         <div className="text-center">
-          <Link to="/auth/role-selection" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            ← Back to role selection
-          </Link>
+          <Button variant="outline" className="w-full text-muted-foreground hover:text-primary transition-colors border-border/50 bg-background/50 backdrop-blur-xl" asChild>
+            <Link to="/auth/role-selection">
+              ← Back to role selection
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

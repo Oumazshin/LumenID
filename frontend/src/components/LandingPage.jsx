@@ -36,7 +36,7 @@ export function LandingPage() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-8 md:py-16">
       <div className="max-w-4xl w-full mx-auto text-center flex flex-col gap-12">
         <div className="flex flex-col gap-6">
           <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg mt-8">
@@ -50,7 +50,7 @@ export function LandingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto w-full">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
@@ -89,27 +89,28 @@ export function LandingPage() {
         <div className="w-full flex justify-center pt-12 border-t border-border">
           <div className="flex flex-col items-center">
             <p className="text-sm font-semibold text-muted-foreground mb-6 text-center tracking-wide uppercase">Quick Access</p>
-            <div className="flex flex-wrap items-center justify-center gap-3 text-base">
-              <button
+            <div className="flex flex-wrap items-center justify-center gap-4 text-base w-full max-w-md mx-auto">
+              <Button
+                variant="outline"
                 onClick={() => navigate("/auth/customer/login")}
-                className="text-primary hover:text-primary/80 transition-colors font-medium px-3 py-1"
+                className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
               >
                 Customer Login
-              </button>
-              <span className="text-muted-foreground/40 select-none font-light">•</span>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => navigate("/auth/verifier/login")}
-                className="text-primary hover:text-primary/80 transition-colors font-medium px-3 py-1"
+                className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
               >
                 Verifier Login
-              </button>
-              <span className="text-muted-foreground/40 select-none font-light">•</span>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => navigate("/auth/customer/signup")}
-                className="text-primary hover:text-primary/80 transition-colors font-medium px-3 py-1"
+                className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10 sm:col-span-2"
               >
                 Create Account
-              </button>
+              </Button>
             </div>
           </div>
         </div>

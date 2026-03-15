@@ -1,31 +1,7 @@
-import { motion } from "framer-motion";
 
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 20,
-    scale: 0.98,
-  },
-  animate: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.4,
-      ease: [0.4, 0, 0.2, 1],
-      staggerChildren: 0.1,
-    },
-  },
-  exit: {
-    opacity: 0,
-    y: -20,
-    scale: 0.98,
-    transition: {
-      duration: 0.3,
-      ease: [0.4, 0, 0.2, 1],
-    },
-  },
-};
+
+import { motion } from "framer-motion";
+import { pageVariants, staggerContainerVariants, staggerItemVariants } from "../styles/animations";
 
 export function PageTransition({ children, className = "" }) {
   return (
@@ -47,13 +23,7 @@ export function StaggerContainer({ children, className = "" }) {
       initial="initial"
       animate="animate"
       exit="exit"
-      variants={{
-        animate: {
-          transition: {
-            staggerChildren: 0.05,
-          },
-        },
-      }}
+      variants={staggerContainerVariants}
       className={className}
     >
       {children}
@@ -64,17 +34,7 @@ export function StaggerContainer({ children, className = "" }) {
 export function StaggerItem({ children, className = "" }) {
   return (
     <motion.div
-      variants={{
-        initial: { opacity: 0, y: 20 },
-        animate: { 
-          opacity: 1, 
-          y: 0,
-          transition: {
-            duration: 0.4,
-            ease: [0.4, 0, 0.2, 1],
-          },
-        },
-      }}
+      variants={staggerItemVariants}
       className={className}
     >
       {children}
