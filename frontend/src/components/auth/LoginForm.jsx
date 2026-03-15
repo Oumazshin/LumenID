@@ -41,8 +41,11 @@ export const LoginForm = ({ role = 'customer', buttonClassName = '', has2FA = fa
   });
 
   return (
-    <Card className={`border border-border/50 bg-card/60 backdrop-blur-xl shadow-xl`}>
-      <CardContent className="pt-6">
+    <Card className={`relative border border-white/10 bg-card/10 backdrop-blur-2xl shadow-2xl overflow-hidden group`}>
+      {/* Subtle corner highlight */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+      
+      <CardContent className="relative p-8 md:p-10">
         {headerContent}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">

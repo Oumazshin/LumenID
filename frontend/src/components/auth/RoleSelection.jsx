@@ -48,15 +48,7 @@ export function RoleSelection() {
 
   return (
     <div className="flex items-center justify-center py-8 md:py-16 relative">
-      {/* Back Button */}
-      <Button 
-        onClick={handleGoBack}
-        variant="outline" 
-        className={`absolute top-4 left-4 sm:top-8 sm:left-8 text-muted-foreground hover:text-foreground border-border/50 bg-background/50 backdrop-blur-xl ${twTransitions.buttonHover}`}
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
-      </Button>
+
 
       <div className="w-full max-w-5xl space-y-12">
         <div className="text-center space-y-4">
@@ -129,6 +121,18 @@ export function RoleSelection() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Centralized Back Button */}
+        <div className="flex justify-center pt-4">
+          <Button 
+            onClick={handleGoBack}
+            variant="ghost" 
+            className={`text-muted-foreground hover:text-foreground border-border/50 bg-white/5 backdrop-blur-xl rounded-2xl h-11 px-6 ${twTransitions.buttonHover}`}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
         </div>
       </div>
     </div>
