@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { HolderIcon, VerifierIcon, IssuerIcon } from "../icons/LumenIcons";
 import { twTransitions } from "../../styles/animations";
