@@ -20,7 +20,7 @@ function TabsList({ className, ...props }) {
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-xl p-[3px]",
+        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-xl p-[3px] flex",
         className,
       )}
       {...props}
@@ -45,10 +45,7 @@ function TabsContent({ className, ...props }) {
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn(
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring flex-1 outline-none transition-all focus-visible:ring-[3px] focus-visible:outline-1",
-        className,
-      )}
+      className={cn("flex-1 outline-none", className)}
       {...props}
     />
   );

@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { cn } from "./utils";
 
 function Card({ className, ...props }) {
@@ -64,7 +65,7 @@ function CardContent({ className, ...props }) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6 last:pb-6", className)}
+      className={cn("px-6 [&:last-child]:pb-6", className)}
       {...props}
     />
   );

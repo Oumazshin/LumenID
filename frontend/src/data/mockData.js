@@ -1,41 +1,3 @@
-/**
- * @typedef {Object} Credential
- * @property {string} id
- * @property {string} type
- * @property {string} issuer
- * @property {string} issuerDID
- * @property {string} recipient
- * @property {string} recipientDID
- * @property {string} issuedDate
- * @property {'active' | 'revoked' | 'pending'} status
- * @property {Object} claims
- * @property {string} claims.fullName
- * @property {string} claims.program
- * @property {string} [claims.major]
- * @property {number} [claims.gpa]
- * @property {string} [claims.honors]
- * @property {string[]} [claims.skills]
- * @property {string} [claims.graduationDate]
- * @property {string} schema
- * @property {string} [hash]
- * @property {Object} [signatures]
- * @property {boolean} [signatures.registrar]
- * @property {boolean} [signatures.dean]
- */
-
-/**
- * @typedef {Object} DIDDocument
- * @property {string} id
- * @property {string} name
- * @property {'institution' | 'student' | 'employer'} type
- * @property {string} [website]
- * @property {string} [location]
- * @property {string} publicKey
- * @property {string} [registrationNumber]
- * @property {string} blockchain
- * @property {boolean} verified
- */
-
 export const mockInstitutionDID = {
   id: 'did:web:excellence.edu.ph',
   name: 'University of Excellence',
@@ -82,6 +44,18 @@ export const mockCredentials = [
       registrar: true,
       dean: true,
     },
+    certifications: [
+      {
+        id: '1',
+        title: 'Academic Excellence Award',
+        organization: 'University of Excellence',
+        issueDate: '2026-05-15',
+        uniqueId: 'CERT-2026-XY7K9P2L',
+        nftAddress: '0x8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b',
+        nftTokenId: '785432',
+        type: 'certification',
+      },
+    ],
   },
   {
     id: 'cred-002',
@@ -98,6 +72,18 @@ export const mockCredentials = [
       skills: ['Security', 'Penetration Testing'],
     },
     schema: 'MicroCredential (JSON-LD)',
+    certifications: [
+      {
+        id: '2',
+        title: 'Security Champion',
+        organization: 'University of Excellence - CS Department',
+        issueDate: '2025-11-20',
+        uniqueId: 'BADGE-2025-MN3K7Q9P',
+        nftAddress: '0x1f2e3d4c5b6a7988776655443322110fedcba987',
+        nftTokenId: '234567',
+        type: 'badge',
+      },
+    ],
   },
   {
     id: 'cred-003',
@@ -114,6 +100,19 @@ export const mockCredentials = [
       skills: ['Node.js', 'PostgreSQL', 'API Design'],
     },
     schema: 'MicroCredential (JSON-LD)',
+    certifications: [
+      {
+        id: '3',
+        title: 'Full Stack Developer',
+        organization: 'Tech Excellence Institute',
+        issueDate: '2025-12-10',
+        expirationDate: '2027-12-10',
+        uniqueId: 'BADGE-2025-PQ8L2M4N',
+        nftAddress: '0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b',
+        nftTokenId: '567890',
+        type: 'badge',
+      },
+    ],
   },
 ];
 

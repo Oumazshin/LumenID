@@ -1,70 +1,247 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { UserCircle } from 'lucide-react';
-
-import { SignupForm } from './SignupForm';
-import { Button } from '../ui/button';
-
-const footerContent = (
-  <div className="mt-10 pt-8 border-t border-border/30">
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex flex-col items-center text-center gap-1">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">Already registered?</span>
-        <p className="text-[13px] text-muted-foreground/60">Manage your existing credentials</p>
-      </div>
-      <Link 
-        to="/auth/customer/login" 
-        className="inline-flex items-center gap-2 group text-primary font-bold text-sm bg-primary/5 hover:bg-primary/10 border border-primary/20 px-4 py-2 rounded-full transition-all"
-      >
-        Sign In to Portal
-        <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
-          <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </Link>
-    </div>
-  </div>
-);
+import { useState } from "react";
+import { useNavigate, Link } from "react-router";
+import { Mail, Lock, Eye, EyeOff, User, UserCircle, Phone } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { toast } from "sonner";
+import { useAuth } from "../../contexts/AuthContext";
 
 export function CustomerSignup() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Mock registration - in production, this would be a real API call
+      await login(formData.email, formData.password, "customer");
+      toast.success("Account created successfully!");
+
+      setTimeout(() => {
+        navigate("/customer/profile-creation");
+        setIsLoading(false);
+      }, 500);
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center py-8 md:py-16">
-      <div className="w-full max-w-xl space-y-8">
-        <div className="text-center">
-          <div className="relative inline-block mb-6">
-            <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl opacity-50" />
-            <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center relative shadow-2xl -rotate-3 group-hover:rotate-0 transition-transform duration-500">
-              <UserCircle className="w-10 h-10 text-white drop-shadow-lg" />
-            </div>
-            {/* badge */}
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-lg bg-background border border-border shadow-sm flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-2xl shadow-lg mb-4">
+            <UserCircle className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-4xl font-black tracking-tighter bg-gradient-to-br from-white via-white to-primary/50 bg-clip-text text-transparent">
-            Create Your Account
-          </h2>
-          <p className="mt-3 text-[15px] font-medium text-muted-foreground leading-relaxed max-w-sm mx-auto">
-            Join the LumenID ecosystem to manage and share your verified digital credentials.
+          <h1 className="text-3xl font-bold">Create Your Account</h1>
+          <p className="text-muted-foreground text-center mx-auto max-w-sm">
+            Join LumenID to manage your digital credentials
           </p>
         </div>
 
-        <SignupForm 
-          buttonClassName="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:opacity-90 text-white border-0 shadow-lg"
-          footerContent={footerContent}
-        />
+        {/* Signup Card */}
+        <Card className="border-2">
+          <CardHeader>
+            <CardTitle>Sign up as Customer</CardTitle>
+            <CardDescription>
+              Fill in your details to get started
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSignup} className="space-y-4">
+              {/* Full Name */}
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="John Doe"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="pl-10"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
 
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="pl-10"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+1 (555) 000-0000"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="pl-10"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pl-10 pr-10"
+                    required
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    className="pl-10 pr-10"
+                    required
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Terms */}
+              <div className="flex items-start gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="mt-1"
+                  required
+                  disabled={isLoading}
+                />
+                <label htmlFor="terms" className="text-xs text-muted-foreground">
+                  I agree to the{" "}
+                  <Link to="/terms" className="text-primary hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/privacy" className="text-primary hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 hover:opacity-90 text-white border-0 shadow-lg"
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+
+            {/* Sign In Link */}
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link to="/auth/customer-login" className="text-primary font-semibold hover:underline">
+                Sign In
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Back Link */}
         <div className="text-center">
-          <Button variant="ghost" className="text-muted-foreground hover:text-white transition-all group" asChild>
-            <Link to="/auth/role-selection" className="flex items-center gap-2">
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
-              Switch Account Type
-            </Link>
-          </Button>
+          <Link to="/auth/role-selection" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            ← Back to role selection
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

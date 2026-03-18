@@ -1,37 +1,52 @@
 import { Outlet, useLocation } from "react-router";
-import { SidebarNavigation } from "./navigation/SidebarNavigation";
+import { PublicNavigation } from "./navigation/PublicNavigation";
+import { CustomerNavigation } from "./navigation/CustomerNavigation";
+import { AdminNavigation } from "./navigation/AdminNavigation";
+import { VerifierNavigation } from "./navigation/VerifierNavigation";
 import { useAuth } from "../contexts/AuthContext";
 
 export function Layout() {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
-  const isCustomerRoute = location.pathname.startsWith("/customer");
-  const isAdminRoute = location.pathname.startsWith("/admin");
+  // Pages that should not display any navigation
+  const hideNavigationPaths = [
+    "/customer/profile-creation",
+  ];
 
-  // Keep navigation hidden on profile creation step or auth paths
-  const shouldRenderSidebar = isAuthenticated && (isCustomerRoute || isAdminRoute) && location.pathname !== "/customer/profile-creation";
+  const shouldHideNavigation = hideNavigationPaths.includes(location.pathname);
 
-  if (shouldRenderSidebar) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col lg:flex-row w-full overflow-hidden">
-        <SidebarNavigation />
-        <main className="flex-1 lg:h-screen lg:overflow-y-auto page-shell pt-20 lg:pt-8 custom-scrollbar">
-          <div className="page-container w-full max-w-7xl mx-auto">
-            <Outlet />
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // Determine which navigation to show
+  const getNavigation = () => {
+    if (shouldHideNavigation) {
+      return null;
+    }
 
-  // Public/Auth routes get no navigation at all, just content
+    // Verifier portal has its own standalone navigation
+    if (location.pathname === "/admin/verifier-portal") {
+      return <VerifierNavigation />;
+    }
+
+    if (!isAuthenticated || location.pathname.startsWith("/auth") || location.pathname === "/") {
+      return <PublicNavigation />;
+    }
+
+    if (user?.role === "customer" && location.pathname.startsWith("/customer")) {
+      return <CustomerNavigation />;
+    }
+
+    if (user?.role === "verifier" && location.pathname.startsWith("/admin")) {
+      return <AdminNavigation />;
+    }
+
+    return <PublicNavigation />;
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <main id="main-content" className="page-shell">
-        <div className="page-container">
-          <Outlet />
-        </div>
+    <div className="min-h-screen">
+      {getNavigation()}
+      <main>
+        <Outlet />
       </main>
     </div>
   );

@@ -1,251 +1,838 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { StatusBadge } from "../../utils/badge.jsx";
+import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {
   CheckCircle2,
   Clock,
   AlertCircle,
+  Upload,
+  ArrowRight,
   Share2,
+  Plus,
+  Trash2,
   FileText,
-  ShieldCheck,
-  MoreVertical,
-  Download,
-  Building2,
-  Loader2
+  X,
+  Award,
+  Eye,
+  Edit,
+  Check,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { PageTransition, StaggerContainer, StaggerItem } from "../PageTransition";
-import { useCredentials } from "../../hooks/useCredentials";
-import { twTransitions } from "../../styles/animations";
+import { motion } from "motion/react";
+import {
+  HolderIcon,
+  SelectiveDisclosureIcon,
+  IPFSLinkIcon,
+  ZKProofIcon,
+  MintCredentialIcon,
+} from "../icons/LumenIcons";
+import { toast } from "sonner";
 
 export function CustomerDashboard() {
-  const { data: credentials, isLoading, error } = useCredentials();
-  const [selectedCredential, setSelectedCredential] = useState(null);
+  const navigate = useNavigate();
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [selectedWalletCredential, setSelectedWalletCredential] = useState(null);
+  const [selectedPendingCredential, setSelectedPendingCredential] = useState(null);
 
-  const stats = useMemo(() => ({
-    total: credentials.length,
-    verified: credentials.filter(c => c.status === "active").length,
-    pending: credentials.filter(c => c.status === "pending").length,
-    rejected: credentials.filter(c => c.status === "revoked").length
-  }), [credentials]);
+  // State for submitting new certifications/badges
+  const [certifications, setCertifications] = useState([
+    {
+      id: "1",
+      certificationTitle: "",
+      issuingOrganization: "",
+      issueDate: "",
+      expirationDate: "",
+      credentialID: "",
+      credentialURL: "",
+      certificationType: "certification",
+      file: null,
+    }
+  ]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-          <p className="text-sm font-medium text-muted-foreground">Loading identity vault...</p>
-        </div>
-      </div>
-    );
-  }
+  // Mock data for pending credentials (offered by institutions)
+  const [pendingCredentials, setPendingCredentials] = useState([
+    {
+      id: "PEND-001",
+      type: "Bachelor of Science in Computer Science",
+      institution: "Stanford University",
+      issuer: "Office of the Registrar",
+      offeredDate: "2024-03-15",
+      credentialType: "diploma"
+    },
+    {
+      id: "PEND-002",
+      type: "AWS Solutions Architect",
+      institution: "Amazon Web Services",
+      issuer: "AWS Training",
+      offeredDate: "2024-03-10",
+      credentialType: "certification"
+    }
+  ]);
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <AlertCircle className="w-12 h-12 text-destructive" />
-        <p className="text-lg font-bold text-destructive">Error Loading Vault</p>
-        <p className="text-sm font-medium text-muted-foreground">{error}</p>
-        <Button variant="outline" onClick={() => window.location.reload()}>Try Again</Button>
-      </div>
-    );
-  }
+  // Mock data for wallet (accepted credentials)
+  const [walletCredentials, setWalletCredentials] = useState([
+    {
+      id: "CRED-001",
+      type: "Master's Degree in Data Science",
+      institution: "MIT",
+      status: "verified",
+      acceptedDate: "2024-01-20",
+      issuer: "MIT Registrar",
+      blockchainHash: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+      ipfsHash: "QmX3j5KVzg4n8K2J5YpH3kVNxG4L9M8NnPa1QwR5Ss7Tt",
+      credentialType: "diploma"
+    }
+  ]);
+
+  // Handlers for certifications
+  const addCertification = () => {
+    setCertifications([
+      ...certifications,
+      {
+        id: Date.now().toString(),
+        certificationTitle: "",
+        issuingOrganization: "",
+        issueDate: "",
+        expirationDate: "",
+        credentialID: "",
+        credentialURL: "",
+        certificationType: "certification",
+        file: null,
+      }
+    ]);
+  };
+
+  const removeCertification = (id) => {
+    setCertifications(certifications.filter(c => c.id !== id));
+    toast.info("Certification removed");
+  };
+
+  const updateCertification = (id, field, value) => {
+    setCertifications(certifications.map(c =>
+      c.id === id ? { ...c, [field]: value } : c
+    ));
+  };
+
+  const handleCertificationFileUpload = (certId, event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const validTypes = ['application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Invalid file type. Please upload PDF only.");
+        return;
+      }
+
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.error("File size exceeds 10MB. Please upload a smaller file.");
+        return;
+      }
+
+      setCertifications(certifications.map(c =>
+        c.id === certId ? { ...c, file } : c
+      ));
+      toast.success(`${file.name} uploaded successfully`);
+    }
+  };
+
+  const handleRemoveCertificationFile = (certId) => {
+    setCertifications(certifications.map(c =>
+      c.id === certId ? { ...c, file: null } : c
+    ));
+    toast.info("File removed");
+  };
+
+  const handleSubmitCertifications = () => {
+    // Add certifications to wallet as unverified
+    const newCredentials = certifications
+      .filter(cert => cert.certificationTitle && cert.issuingOrganization && cert.issueDate)
+      .map(cert => ({
+        id: `USER-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: cert.certificationTitle,
+        institution: cert.issuingOrganization,
+        status: "unverified",
+        acceptedDate: new Date().toISOString().split('T')[0],
+        issuer: "Self-Submitted",
+        blockchainHash: null,
+        ipfsHash: null,
+        credentialType: cert.certificationType,
+      }));
+
+    setWalletCredentials([...walletCredentials, ...newCredentials]);
+    toast.success(`${newCredentials.length} credential(s) added to wallet`);
+    setShowSubmitDialog(false);
+
+    // Reset form
+    setCertifications([{
+      id: "1",
+      certificationTitle: "",
+      issuingOrganization: "",
+      issueDate: "",
+      expirationDate: "",
+      credentialID: "",
+      credentialURL: "",
+      certificationType: "certification",
+      file: null,
+    }]);
+  };
+
+  // Handlers for pending credentials
+  const handleAcceptCredential = (id) => {
+    const credential = pendingCredentials.find(c => c.id === id);
+    if (credential) {
+      // Move to wallet
+      setWalletCredentials([
+        ...walletCredentials,
+        {
+          ...credential,
+          status: "verified",
+          acceptedDate: new Date().toISOString().split('T')[0],
+          blockchainHash: "0x" + Math.random().toString(36).substring(2, 42),
+          ipfsHash: "Qm" + Math.random().toString(36).substring(2, 48),
+        }
+      ]);
+      // Remove from pending
+      setPendingCredentials(pendingCredentials.filter(c => c.id !== id));
+      toast.success("Credential accepted and added to your wallet");
+    }
+  };
+
+  const handleRejectCredential = (id) => {
+    setPendingCredentials(pendingCredentials.filter(c => c.id !== id));
+    toast.info("Credential rejected");
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "verified":
+        return (
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+            <CheckCircle2 className="w-3 h-3 mr-1" />
+            Verified
+          </Badge>
+        );
+      case "unverified":
+        // No badge for unverified user-submitted credentials
+        return null;
+      default:
+        return null;
+    }
+  };
+
+  const stats = {
+    wallet: walletCredentials.length,
+    pending: pendingCredentials.length,
+  };
 
   return (
     <PageTransition>
-      <div className="flex flex-col gap-8 w-full pb-16">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/40 border border-border/50 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-sm">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-sm">
-              My Identity Vault
+      <div className="page-shell relative">
+        <div className="page-container space-y-8 sm:space-y-12 relative z-[2]">
+          {/* Header */}
+          <div className="text-center space-y-3 sm:space-y-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              Identity Vault
             </h1>
-            <p className="text-base text-muted-foreground max-w-xl">
-              Manage, share, and securely track all of your verifiable digital credentials in one place.
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+              Manage your digital credentials and identity vault
             </p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 transition-opacity text-white border-0 shadow-lg shadow-cyan-500/20 h-11 px-6 rounded-xl font-medium">
-              <ShieldCheck className="w-5 h-5 mr-2" />
-              Request Credential
-            </Button>
-          </div>
+
+          {/* Stats Grid */}
+          <StaggerContainer>
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
+              <StaggerItem>
+                <Card className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl sm:text-3xl font-bold mb-1">{stats.wallet}</p>
+                        <p className="text-xs text-muted-foreground">Wallet Credentials</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </StaggerItem>
+
+              <StaggerItem>
+                <Card className="border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-2xl sm:text-3xl font-bold mb-1">{stats.pending}</p>
+                        <p className="text-xs text-muted-foreground">Pending Offers</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </StaggerItem>
+            </div>
+          </StaggerContainer>
+
+          {/* Submit New Credential Section */}
+          <Card className="border bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-indigo-500/5">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1 text-sm sm:text-base">Submit New Credential</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      Upload certifications and badges for verification
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-white border-0"
+                  onClick={() => setShowSubmitDialog(true)}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pending Credentials */}
+          {pendingCredentials.length > 0 && (
+            <Card className="border">
+              <CardHeader>
+                <CardTitle>Pending Credential Offers</CardTitle>
+                <CardDescription>Review and accept credentials offered by institutions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {pendingCredentials.map((credential) => (
+                    <Card key={credential.id} className="border hover:border-yellow-500/30 transition-colors">
+                      <CardContent className="pt-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2 flex-wrap">
+                              <h4 className="font-semibold">{credential.type}</h4>
+                              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Pending
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              {credential.institution}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Offered: {credential.offeredDate} • From: {credential.issuer}
+                            </p>
+                          </div>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedPendingCredential(credential)}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white border-0"
+                              onClick={() => handleAcceptCredential(credential.id)}
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Accept
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-red-400 hover:text-red-300 border-red-500/30"
+                              onClick={() => handleRejectCredential(credential.id)}
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Wallet Credentials */}
+          <Card className="border">
+            <CardHeader>
+              <CardTitle>My Wallet</CardTitle>
+              <CardDescription>Your verified and accepted credentials</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {walletCredentials.map((credential) => (
+                  <Card key={credential.id} className="border hover:border-primary/30 transition-colors">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <h4 className="font-semibold">{credential.type}</h4>
+                            {getStatusBadge(credential.status)}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {credential.institution}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Accepted: {credential.acceptedDate}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedWalletCredential(credential)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View
+                          </Button>
+                          {credential.status === "unverified" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-white border-0"
+                          >
+                            <Share2 className="w-4 h-4 mr-1" />
+                            Share
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Stats Section */}
-        <StaggerContainer>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
-            <StaggerItem>
-              <Card className={`group border-border/50 bg-card/40 backdrop-blur-xl ${twTransitions.cardHover} cursor-pointer`}>
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 ${twTransitions.base}`}>
-                      <FileText className="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p className="text-4xl font-black text-foreground mb-1 tracking-tight">{stats.total}</p>
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Total Credentials</p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-            
-            <StaggerItem delay={100}>
-              <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-success/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center text-success group-hover:scale-110 group-hover:bg-success/20 ${twTransitions.base}`}>
-                      <CheckCircle2 className="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p className="text-4xl font-black text-success mb-1 tracking-tight">{stats.verified}</p>
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Active & Verified</p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
+        {/* Submit Certification Dialog */}
+        <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto border">
+            <DialogHeader className="pr-8">
+              <DialogTitle className="text-2xl font-bold">
+                Submit Certifications & Badges
+              </DialogTitle>
+              <DialogDescription>
+                Upload your certifications and badges for verification
+              </DialogDescription>
+            </DialogHeader>
 
-            <StaggerItem delay={200}>
-              <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-warning/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center text-warning group-hover:scale-110 group-hover:bg-warning/20 ${twTransitions.base}`}>
-                      <Clock className="w-6 h-6" />
+            <div className="space-y-6 pt-2">
+              {certifications.map((cert, index) => (
+                <Card key={cert.id} className="border-2 border-dashed">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">
+                        {cert.certificationType === "certification" ? "Certification" : "Badge"} #{index + 1}
+                      </CardTitle>
+                      {certifications.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCertification(cert.id)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
-                  </div>
-                  <p className="text-4xl font-black text-warning mb-1 tracking-tight">{stats.pending}</p>
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Pending Review</p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`type-${cert.id}`}>
+                          Type <span className="text-red-500">*</span>
+                        </Label>
+                        <Select
+                          value={cert.certificationType}
+                          onValueChange={(value) =>
+                            updateCertification(cert.id, "certificationType", value)
+                          }
+                        >
+                          <SelectTrigger className="h-11">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="certification">Certification</SelectItem>
+                            <SelectItem value="badge">Badge</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-            <StaggerItem delay={300}>
-              <Card className="border border-border/50 bg-card/60 backdrop-blur-xl hover:border-destructive/50 transition-all shadow-sm hover:shadow-md group rounded-2xl overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center text-destructive group-hover:scale-110 group-hover:bg-destructive/20 ${twTransitions.base}`}>
-                      <AlertCircle className="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p className="text-4xl font-black text-destructive mb-1 tracking-tight">{stats.rejected}</p>
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Revoked</p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-          </div>
-        </StaggerContainer>
+                      <div className="space-y-2">
+                        <Label htmlFor={`title-${cert.id}`}>
+                          Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id={`title-${cert.id}`}
+                          placeholder="e.g., AWS Solutions Architect"
+                          value={cert.certificationTitle}
+                          onChange={(e) => updateCertification(cert.id, "certificationTitle", e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
 
-        {/* Credentials List Section */}
-        <Card className="border border-border/50 bg-card/40 backdrop-blur-xl shadow-sm rounded-3xl overflow-hidden">
-          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-5 pt-8 bg-card/30">
-            <div className="flex flex-col gap-1">
-              <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">Recent Credentials</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">View your individual digital documents below</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" className="hidden sm:flex mt-4 sm:mt-0 rounded-lg">
-              Filter Log
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-border/50">
-              {credentials.map((credential) => (
-                <div 
-                  key={credential.id} 
-                  className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 sm:px-8 hover:bg-white/5 dark:hover:bg-white-[0.02] transition-colors"
-                >
-                  <div className="flex items-start gap-5 flex-1">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5 shadow-sm border border-primary/10">
-                      <ShieldCheck className="w-6 h-6" />
-                    </div>
-                    <div className="min-w-0 flex flex-col justify-center">
-                      <h4 className="font-bold text-foreground text-lg mb-1">{credential.type}</h4>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap font-medium">
-                        <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5"/> {credential.issuer}</span>
-                        <span className="opacity-50">•</span>
-                        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5"/> Issued: {credential.issuedDate}</span>
+                      <div className="space-y-2">
+                        <Label htmlFor={`org-${cert.id}`}>
+                          Issuing Organization <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id={`org-${cert.id}`}
+                          placeholder="e.g., Amazon Web Services"
+                          value={cert.issuingOrganization}
+                          onChange={(e) => updateCertification(cert.id, "issuingOrganization", e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`issueDate-${cert.id}`}>
+                          Issue Date <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id={`issueDate-${cert.id}`}
+                          type="date"
+                          value={cert.issueDate}
+                          onChange={(e) => updateCertification(cert.id, "issueDate", e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`expirationDate-${cert.id}`}>
+                          Expiration Date
+                        </Label>
+                        <Input
+                          id={`expirationDate-${cert.id}`}
+                          type="date"
+                          value={cert.expirationDate}
+                          onChange={(e) => updateCertification(cert.id, "expirationDate", e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor={`credID-${cert.id}`}>
+                          Credential ID
+                        </Label>
+                        <Input
+                          id={`credID-${cert.id}`}
+                          placeholder="e.g., ABC123XYZ"
+                          value={cert.credentialID}
+                          onChange={(e) => updateCertification(cert.id, "credentialID", e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor={`credURL-${cert.id}`}>
+                          Credential URL
+                        </Label>
+                        <Input
+                          id={`credURL-${cert.id}`}
+                          placeholder="https://verify.example.com/credential/123"
+                          value={cert.credentialURL}
+                          onChange={(e) => updateCertification(cert.id, "credentialURL", e.target.value)}
+                          className="h-11"
+                        />
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between md:justify-end gap-6 ml-17 md:ml-0 border-t md:border-t-0 border-border/30 pt-4 md:pt-0">
-                    <StatusBadge status={credential.status} />
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="rounded-lg h-9" onClick={() => setSelectedCredential(credential)}>
-                        View Details
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-muted-foreground h-9 w-9 rounded-lg hidden sm:flex">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+
+                    {/* File Upload */}
+                    <div className="space-y-2">
+                      <Label>Upload Certificate (PDF)</Label>
+                      <div className="border-2 border-dashed rounded-lg p-4 hover:border-primary/50 transition-colors">
+                        {!cert.file ? (
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                              <Upload className="w-6 h-6 text-white" />
+                            </div>
+                            <div className="text-center">
+                              <p className="text-sm font-medium mb-1">Upload Certificate</p>
+                              <p className="text-xs text-muted-foreground">PDF only (Max 10MB)</p>
+                            </div>
+                            <label htmlFor={`fileUpload-${cert.id}`} className="cursor-pointer">
+                              <Button type="button" variant="outline" size="sm" asChild>
+                                <span>
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  Browse Files
+                                </span>
+                              </Button>
+                            </label>
+                            <input
+                              id={`fileUpload-${cert.id}`}
+                              type="file"
+                              accept=".pdf"
+                              onChange={(e) => handleCertificationFileUpload(cert.id, e)}
+                              className="hidden"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium">{cert.file.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {(cert.file.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveCertificationFile(cert.id)}
+                              className="text-red-400 hover:text-red-300"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Credential Details Dialog */}
-      <Dialog open={!!selectedCredential} onOpenChange={() => setSelectedCredential(null)}>
-        <DialogContent className="max-w-2xl border border-white/10 bg-background/95 backdrop-blur-3xl p-0 overflow-hidden shadow-2xl rounded-3xl sm:rounded-[2rem]">
-          {selectedCredential && (
-            <>
-              <div className="p-6 sm:p-10 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-b border-white/5 relative">
-                <div className="absolute top-6 right-6 sm:top-8 sm:right-8">
-                   <StatusBadge status={selectedCredential.status} />
-                </div>
-                <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mb-6 shadow-inner border border-primary/20 backdrop-blur-md">
-                  <ShieldCheck className="w-8 h-8" />
-                </div>
-                <DialogTitle className="text-3xl sm:text-4xl font-extrabold mb-3 tracking-tight text-foreground">{selectedCredential.type}</DialogTitle>
-                <DialogDescription className="text-base sm:text-lg">
-                  Issued by <span className="font-bold text-foreground mx-1">{selectedCredential.issuer}</span> on {selectedCredential.issuedDate}
-                </DialogDescription>
+
+              {/* Add More Button */}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addCertification}
+                className="w-full border-dashed border-2 h-12"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Another {certifications[0]?.certificationType === "certification" ? "Certification" : "Badge"}
+              </Button>
+
+              {/* Submit Button */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  onClick={handleSubmitCertifications}
+                  className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-white border-0 h-11"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-11"
+                  onClick={() => setShowSubmitDialog(false)}
+                >
+                  Cancel
+                </Button>
               </div>
-              
-              <div className="p-6 sm:p-10 space-y-8 overflow-y-auto max-h-[60vh] custom-scrollbar">
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold tracking-widest text-muted-foreground/80 uppercase">Verified Claims</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {Object.entries(selectedCredential.claims || {}).map(([key, value]) => (
-                      <div key={key} className="p-5 rounded-2xl bg-white/5 border border-white/5 shadow-sm">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                        <p className="font-semibold text-foreground text-sm">{String(value)}</p>
-                      </div>
-                    ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Wallet Credential Details Dialog */}
+        <Dialog open={!!selectedWalletCredential} onOpenChange={() => setSelectedWalletCredential(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border">
+            <DialogHeader className="pr-8">
+              <DialogTitle className="text-2xl font-bold">
+                {selectedWalletCredential?.type}
+              </DialogTitle>
+              <DialogDescription>
+                Review credential details and status
+              </DialogDescription>
+            </DialogHeader>
+            {selectedWalletCredential && (
+              <div className="space-y-6 pt-2">
+                {/* Status */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Status</h3>
+                  <div className="p-4 bg-secondary/50 rounded-lg border">
+                    {getStatusBadge(selectedWalletCredential.status)}
                   </div>
                 </div>
 
-                {selectedCredential.hash && (
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold tracking-widest text-muted-foreground/80 uppercase">Blockchain Verification</h4>
-                    <div className="p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-2">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Transaction Hash</p>
-                      <p className="font-mono text-sm break-all text-primary/90 bg-black/20 p-3 rounded-lg border border-white/5">{selectedCredential.hash}</p>
+                {/* Credential Information */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Credential Information</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-2">Credential ID</p>
+                      <p className="text-sm font-mono">{selectedWalletCredential.id}</p>
+                    </div>
+                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-2">Type</p>
+                      <p className="text-sm font-semibold">{selectedWalletCredential.type}</p>
+                    </div>
+                    <div className="p-4 bg-secondary/50 rounded-lg border col-span-2">
+                      <p className="text-xs text-muted-foreground mb-2">Institution</p>
+                      <p className="text-sm font-semibold">{selectedWalletCredential.institution}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Timeline</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-2">Accepted Date</p>
+                      <p className="text-sm font-semibold">{selectedWalletCredential.acceptedDate}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Blockchain Information */}
+                {selectedWalletCredential.status === "verified" && selectedWalletCredential.blockchainHash && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Blockchain Verification</h3>
+                    <div className="p-4 bg-gradient-to-br from-cyan-500/5 via-blue-500/5 to-indigo-500/5 border border-primary/30 rounded-lg">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">On-Chain Verified</p>
+                          <p className="text-xs text-muted-foreground">This credential is immutably recorded on the blockchain</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Transaction Hash:</span>
+                          <span className="font-mono text-cyan-400">{selectedWalletCredential.blockchainHash}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">IPFS Hash:</span>
+                          <span className="font-mono text-cyan-400">{selectedWalletCredential.ipfsHash}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-white border-0 h-11">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share Credential
+                  </Button>
+                  {selectedWalletCredential.status === "unverified" && (
+                    <Button variant="outline" className="h-11">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                  )}
+                  <Button variant="outline" className="h-11" onClick={() => setSelectedWalletCredential(null)}>
+                    Close
+                  </Button>
+                </div>
               </div>
-              
-              <div className="bg-black/20 p-5 sm:px-10 border-t border-white/5 flex flex-col-reverse sm:flex-row justify-end gap-3 backdrop-blur-xl">
-                <Button 
-                  className={`w-full bg-primary text-primary-foreground h-12 text-base font-semibold ${twTransitions.buttonHover}`}
-                  onClick={() => setSelectedCredential(null)}
-                >
-                  Done
-                </Button>
-                <Button variant="outline" className="sm:w-auto w-full group rounded-xl h-11 border-white/10 hover:bg-white/5">
-                  <Download className="w-4 h-4 mr-2 group-hover:-translate-y-0.5 transition-transform" />
-                  Download
-                </Button>
-                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 sm:w-auto w-full text-white shadow-lg shadow-primary/20 rounded-xl h-11 px-8 font-semibold">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share Proof
-                </Button>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Pending Credential Details Dialog */}
+        <Dialog open={!!selectedPendingCredential} onOpenChange={() => setSelectedPendingCredential(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border">
+            <DialogHeader className="pr-8">
+              <DialogTitle className="text-2xl font-bold">
+                {selectedPendingCredential?.type}
+              </DialogTitle>
+              <DialogDescription>
+                Review credential offer details
+              </DialogDescription>
+            </DialogHeader>
+            {selectedPendingCredential && (
+              <div className="space-y-6 pt-2">
+                {/* Status */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Status</h3>
+                  <div className="p-4 bg-secondary/50 rounded-lg border">
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                      <Clock className="w-3 h-3 mr-1" />
+                      Pending Your Acceptance
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Credential Information */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Offer Information</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 bg-secondary/50 rounded-lg border col-span-2">
+                      <p className="text-xs text-muted-foreground mb-2">Credential Type</p>
+                      <p className="text-sm font-semibold">{selectedPendingCredential.type}</p>
+                    </div>
+                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-2">Institution</p>
+                      <p className="text-sm font-semibold">{selectedPendingCredential.institution}</p>
+                    </div>
+                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                      <p className="text-xs text-muted-foreground mb-2">Issuer</p>
+                      <p className="text-sm font-semibold">{selectedPendingCredential.issuer}</p>
+                    </div>
+                    <div className="p-4 bg-secondary/50 rounded-lg border col-span-2">
+                      <p className="text-xs text-muted-foreground mb-2">Offered Date</p>
+                      <p className="text-sm font-semibold">{selectedPendingCredential.offeredDate}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white border-0 h-11"
+                    onClick={() => {
+                      handleAcceptCredential(selectedPendingCredential.id);
+                      setSelectedPendingCredential(null);
+                    }}
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Accept Credential
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 text-red-400 hover:text-red-300 border-red-500/30"
+                    onClick={() => {
+                      handleRejectCredential(selectedPendingCredential.id);
+                      setSelectedPendingCredential(null);
+                    }}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Reject
+                  </Button>
+                  <Button variant="outline" className="h-11" onClick={() => setSelectedPendingCredential(null)}>
+                    Close
+                  </Button>
+                </div>
               </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </PageTransition>
   );
 }

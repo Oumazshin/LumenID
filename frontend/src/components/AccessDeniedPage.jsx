@@ -18,8 +18,9 @@ export function AccessDeniedPage() {
   };
 
   return (
-    <div className="flex items-center justify-center py-12 md:py-24">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center space-y-8">
+        {/* Icon */}
         <div className="relative flex justify-center">
           <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-red-500/20 via-orange-500/20 to-yellow-500/20 backdrop-blur-xl rounded-full border border-red-500/30 flex items-center justify-center">
             <Shield className="w-16 h-16 md:w-20 md:h-20 text-red-500/80" />
@@ -31,12 +32,13 @@ export function AccessDeniedPage() {
           </div>
         </div>
 
+        {/* Content */}
         <div className="space-y-4">
           <h1 className="text-3xl md:text-4xl font-bold text-red-500">Access Denied</h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
             You don't have permission to access this page. This area is restricted to authorized users only.
           </p>
-          
+
           {isAuthenticated && user && (
             <div className="p-4 bg-secondary/50 rounded-lg border border-border/50 max-w-md mx-auto">
               <p className="text-sm text-muted-foreground">
@@ -49,6 +51,7 @@ export function AccessDeniedPage() {
           )}
         </div>
 
+        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
           <Button
             size="lg"
@@ -59,7 +62,7 @@ export function AccessDeniedPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Back
           </Button>
-          
+
           {isAuthenticated ? (
             <Button
               size="lg"
@@ -81,6 +84,7 @@ export function AccessDeniedPage() {
           )}
         </div>
 
+        {/* Help Text */}
         <div className="pt-8 border-t border-border/30">
           <p className="text-sm text-muted-foreground mb-2">Need access?</p>
           <p className="text-xs text-muted-foreground max-w-lg mx-auto">

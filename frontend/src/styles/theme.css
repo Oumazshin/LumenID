@@ -424,48 +424,6 @@
     }
   }
 
-  @keyframes shooting-star-1 {
-    0% {
-      transform: translateX(-100px) translateY(0);
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(1000px) translateY(500px);
-      opacity: 0;
-    }
-  }
-
-  @keyframes shooting-star-2 {
-    0% {
-      transform: translateX(-100px) translateY(0);
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(1200px) translateY(400px);
-      opacity: 0;
-    }
-  }
-
-  @keyframes shooting-star-3 {
-    0% {
-      transform: translateX(100px) translateY(0);
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(-1000px) translateY(600px);
-      opacity: 0;
-    }
-  }
-
   @keyframes pulse-slow {
     0%, 100% {
       opacity: 0.3;
@@ -547,21 +505,6 @@
 
   .animate-twinkle {
     animation: twinkle 3s ease-in-out infinite;
-  }
-
-  .animate-shooting-star-1 {
-    animation: shooting-star-1 3s linear infinite;
-    animation-delay: 2s;
-  }
-
-  .animate-shooting-star-2 {
-    animation: shooting-star-2 4s linear infinite;
-    animation-delay: 5s;
-  }
-
-  .animate-shooting-star-3 {
-    animation: shooting-star-3 3.5s linear infinite;
-    animation-delay: 8s;
   }
 
   .animate-pulse-slow {

@@ -1,89 +1,197 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
-
-import { LoginForm } from './LoginForm';
-import { Button } from '../ui/button';
-
-const restrictedBanner = (
-  <div className="relative group overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-md p-4 mb-8">
-    {/* Decorative background pulse */}
-    <div className="absolute inset-0 bg-emerald-500/5 animate-pulse" />
-    <div className="relative flex items-center gap-4">
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-        <ShieldCheck className="w-5 h-5 text-emerald-400" />
-      </div>
-      <div className="space-y-0.5">
-        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Security Protocol</p>
-        <p className="text-sm font-medium text-emerald-100/80">Authorized access only. Session monitored.</p>
-      </div>
-    </div>
-  </div>
-);
-
-const footerContent = (
-  <div className="mt-10 pt-8 border-t border-border/30">
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex flex-col items-center text-center gap-1">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">New Credential Request</span>
-        <p className="text-[13px] text-muted-foreground/60">Missing verifier permissions?</p>
-      </div>
-      <Link 
-        to="/auth/request-access" 
-        className="inline-flex items-center gap-2 group text-primary font-bold text-sm bg-primary/5 hover:bg-primary/10 border border-primary/20 px-4 py-2 rounded-full transition-all"
-      >
-        Request Access Portal
-        <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center group-hover:translate-x-1 transition-transform">
-          <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </Link>
-    </div>
-  </div>
-);
+import { useState } from "react";
+import { Link } from "react-router";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { toast } from "sonner";
+import { useAuth } from "../../contexts/AuthContext";
+import { useAuthNavigation } from "../../hooks/useAuthNavigation";
+import { ROUTES } from "../../constants/routes";
 
 export function VerifierLogin() {
+  const { login } = useAuth();
+  const { navigate } = useAuthNavigation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    verificationCode: ""
+  });
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // Mock authentication with 2FA
+    if (!formData.email || !formData.password || !formData.verificationCode) {
+      toast.error("Please fill in all fields including 2FA code");
+      return;
+    }
+
+    // Validate 2FA code is 6 digits
+    if (!/^\d{6}$/.test(formData.verificationCode)) {
+      toast.error("2FA code must be 6 digits");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await login(formData.email, formData.password, "verifier");
+      toast.success("Authentication successful. Welcome to admin panel.");
+
+      // Navigate after successful login with safe navigation
+      navigate(ROUTES.ADMIN.DASHBOARD, 500);
+    } catch (error) {
+      toast.error("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center py-8 md:py-16">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <div className="relative inline-block mb-6">
-            <div className="absolute -inset-4 bg-emerald-500/20 rounded-full blur-2xl opacity-50" />
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center relative shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500">
-              <ShieldCheck className="w-10 h-10 text-white drop-shadow-lg" />
-            </div>
-            {/* badge */}
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-lg bg-background border border-border shadow-sm flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl shadow-lg mb-4">
+            <ShieldCheck className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-4xl font-black tracking-tighter bg-gradient-to-br from-white via-white to-emerald-500/50 bg-clip-text text-transparent">
-            Verifier Portal
-          </h2>
-          <p className="mt-3 text-[15px] font-medium text-muted-foreground leading-relaxed max-w-xs mx-auto">
-            Gateway to secure credential validation and identity verification.
+          <h1 className="text-3xl font-bold text-center">Verifier Login</h1>
+          <p className="text-muted-foreground text-center mx-auto max-w-sm">
+            Secure access to administrative dashboard
           </p>
         </div>
 
-        <LoginForm 
-          role="verifier" 
-          has2FA={true}
-          buttonClassName="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-white border-0 shadow-lg text-center"
-          headerContent={restrictedBanner}
-          footerContent={footerContent}
-        />
+        {/* Login Card */}
+        <Card className="border-2">
+          <CardHeader>
+            <CardTitle>Administrator Access</CardTitle>
+            <CardDescription>
+              Enter your credentials and 2FA code to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@institution.edu"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="pl-10"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
 
+              {/* Password */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link to="/auth/forgot-password" className="text-xs text-primary hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pl-10 pr-10"
+                    required
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* 2FA Code */}
+              <div className="space-y-2">
+                <Label htmlFor="verificationCode">Two-Factor Authentication Code</Label>
+                <div className="relative">
+                  <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="verificationCode"
+                    type="text"
+                    placeholder="000000"
+                    maxLength={6}
+                    value={formData.verificationCode}
+                    onChange={(e) => setFormData({ ...formData, verificationCode: e.target.value.replace(/\D/g, '') })}
+                    className="pl-10 font-mono tracking-widest text-center"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter the 6-digit code from your authenticator app
+                </p>
+              </div>
+
+              {/* Security Notice */}
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+                <p className="text-xs text-amber-400 flex items-center gap-2">
+                  <Lock className="w-3 h-3 flex-shrink-0" />
+                  <span>This is a secure admin portal. All login attempts are monitored and logged.</span>
+                </p>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:opacity-90 text-white border-0 shadow-lg"
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Authenticating..." : "Sign In to Admin Panel"}
+              </Button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Need Access?</span>
+              </div>
+            </div>
+
+            {/* Request Access */}
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Don't have verifier credentials? </span>
+              <Link to="/auth/request-access" className="text-primary font-semibold hover:underline">
+                Request Access
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Back Link */}
         <div className="text-center">
-          <Button variant="ghost" className="text-muted-foreground hover:text-white transition-all group" asChild>
-            <Link to="/auth/role-selection" className="flex items-center gap-2">
-              <span className="group-hover:-translate-x-1 transition-transform">←</span>
-              Switch Verification Role
-            </Link>
-          </Button>
+          <Link to="/auth/role-selection" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            ← Back to role selection
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,18 +1,71 @@
 import { useNavigate } from "react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield, Award, CheckCircle2 } from "lucide-react";
 import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import {
   IssuerIcon,
+  HolderIcon,
+  VerifierIcon,
   BlockchainAnchorIcon,
   ZKProofIcon,
+  IPFSLinkIcon,
   TrustTriangle,
 } from "./icons/LumenIcons";
-import { LogIn, UserPlus, ShieldCheck } from "lucide-react";
-import { twTransitions, fadeScale, fadeInUp, staggerContainerVariants, staggerItemVariants } from "../styles/animations";
-import { motion } from "framer-motion";
+import { LumenCard3D } from "./LumenCard3D";
+import { JumpingScroll } from "./ui/JumpingScroll";
+import { Typography } from "./ui/typography";
+import { ROUTES } from "../constants/routes";
 
 export function LandingPage() {
   const navigate = useNavigate();
+
+  const roles = [
+    {
+      title: "Organization",
+      description: "Issue and verify credentials with blockchain trust",
+      subtitle: "For Institutions & Employers",
+      icon: IssuerIcon,
+      gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
+      features: [
+        "W3C-Compliant Credentials",
+        "Multi-Sig Authorization",
+        "Blockchain Anchoring",
+        "Instant Verification"
+      ],
+      path: ROUTES.AUTH.VERIFIER_LOGIN,
+      buttonText: "Admin Portal"
+    },
+    {
+      title: "User",
+      description: "Store and manage your digital credentials securely",
+      subtitle: "For Students & Individuals",
+      icon: HolderIcon,
+      gradient: "from-cyan-500 via-blue-500 to-indigo-500",
+      features: [
+        "Share Credentials Instantly",
+        "Secure Digital Wallet",
+        "Zero-Knowledge Proofs",
+        "Privacy-First Design"
+      ],
+      path: ROUTES.AUTH.CUSTOMER_LOGIN,
+      buttonText: "Access Vault"
+    },
+    {
+      title: "Relying Party",
+      description: "Instantly verify cryptographic credentials",
+      subtitle: "For Verifiers & Employers",
+      icon: VerifierIcon,
+      gradient: "from-emerald-500 via-teal-500 to-cyan-500",
+      features: [
+        "Zero-Trust Verification",
+        "On-Chain Integrity",
+        "One-Click Scanning",
+        "Instant Results"
+      ],
+      path: ROUTES.VERIFY,
+      buttonText: "Verify Credential"
+    }
+  ];
 
   const features = [
     {
@@ -24,10 +77,9 @@ export function LandingPage() {
     },
     {
       icon: BlockchainAnchorIcon,
-      title: "Polygon Network",
+      title: "Polkadot Network",
       description: "Secure blockchain infrastructure",
       color: "from-cyan-500 to-blue-500",
-      glow: "shadow-cyan-500/20",
     },
     {
       icon: ZKProofIcon,
@@ -39,161 +91,201 @@ export function LandingPage() {
   ];
 
   return (
-    <div className="flex items-center justify-center py-12 md:py-24">
-      <div className="max-w-5xl w-full mx-auto text-center flex flex-col gap-24 px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          variants={fadeScale}
-          initial="initial"
-          animate="animate"
-          className="flex flex-col gap-6"
-        >
-          <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-2xl mt-8">
-            LumenID
-          </h1>
-          <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight max-w-2xl mx-auto">
-            Blockchain-Based Digital Credential Management
-          </p>
-          <p className="text-lg text-muted-foreground/80 max-w-xl mx-auto leading-relaxed">
-            Powered by Decentralized Identifiers (DIDs), On-Chain Revocation Registry, and Multi-Sig Authorization
-          </p>
-        </motion.div>
+    <div className="relative">
 
-        <motion.div 
-          variants={staggerContainerVariants}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
-                key={feature.title}
-                variants={staggerItemVariants}
-                className={`p-8 rounded-3xl bg-card/40 backdrop-blur-2xl border border-border/40 ${twTransitions.cardHover} group relative overflow-hidden`}
-              >
-                {/* Subtle background glow on card hover */}
-                <div className={`absolute -inset-1 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-[0.03] blur-2xl transition-opacity duration-500`} />
-                
-                <div className={`w-14 h-14 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg ${feature.glow} group-hover:scale-110 group-hover:rotate-3 ${twTransitions.base}`}>
-                  <Icon size={28} className="text-white" />
-                </div>
-                <h3 className="text-lg font-bold mb-3 text-foreground/90">{feature.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground/90">{feature.description}</p>
-                
-                {/* Decorative bottom line */}
-                <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${feature.color} group-hover:w-1/3 transition-all duration-500 opacity-50`} />
-              </motion.div>
-            );
-          })}
-        </motion.div>
+      {/* ==================== SECTION 1: HERO (100vh) ==================== */}
+      <section className="min-h-screen relative flex items-center justify-center px-4 sm:px-6">
+        <div className="max-w-7xl w-full mx-auto py-12 md:py-20 relative z-[2]">
+          <div className="flex flex-col items-center text-center">
+            {/* Hero Content */}
+            <div className="text-center space-y-8 md:space-y-12 relative z-10">
+              {/* Main Title */}
+              <div className="space-y-4 md:space-y-6">
+                <Typography.H1 className="text-5xl md:text-6xl lg:text-7xl">
+                  <span className="text-white">Lumen</span>
+                  <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">ID</span>
+                </Typography.H1>
+                <Typography.H2 className="text-2xl md:text-3xl lg:text-4xl">
+                  <span className="text-white/90">Digital Trust,</span>
+                  {' '}
+                  <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent">Secured.</span>
+                </Typography.H2>
+              </div>
 
-        <motion.div 
-          variants={fadeInUp}
-          initial="initial"
-          whileInView="whileInView"
-          viewport={{ once: true }}
-          className="flex flex-col items-center mt-8 relative"
-        >
-          {/* Subtle background glow for the whole diagram */}
-          <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full -z-10" />
-          
-          <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-            <ShieldCheck className="w-4 h-4 text-primary" />
-            <span className="text-[11px] font-bold text-foreground/80 tracking-[0.2em] uppercase">
-              Decentralized Trust Architecture
-            </span>
-          </div>
-          
-          <TrustTriangle size="md" className="w-full max-w-4xl" />
-          
-          <p className="mt-6 text-sm text-muted-foreground/60 max-w-md mx-auto italic">
-            A secure ecosystem where identity is sovereign and verification is instant.
-          </p>
-        </motion.div>
+              {/* Visual Separator */}
+              <div className="flex justify-center">
+                <div className="h-px w-24 sm:w-32 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+              </div>
 
-        <div className="flex flex-col sm:flex-row gap-8 justify-center items-center py-4">
-          <Button
-            size="lg"
-            onClick={() => navigate("/auth/role-selection")}
-            className={`
-              relative group overflow-hidden
-              bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 
-              hover:opacity-100 text-white border-0 
-              shadow-[0_0_20px_rgba(6,182,212,0.3)] 
-              hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]
-              px-10 py-7 text-xl font-bold rounded-2xl
-              ${twTransitions.buttonHover}
-            `}
-          >
-            {/* Animated shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-            
-            <span className="relative z-10 flex items-center gap-2">
-              Get Started Now
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </span>
-          </Button>
-        </div>
+              {/* Value Proposition */}
+              <div className="space-y-4 max-w-2xl mx-auto">
+                <Typography.P className="text-lg md:text-xl text-white/80">
+                  Issue, store, and verify credentials using blockchain technology.
+                </Typography.P>
+                <Typography.P className="text-base text-muted-foreground">
+                  Fast, secure, and privacy-first design for the modern web.
+                </Typography.P>
+              </div>
+            </div>
 
-        <div className="w-full flex justify-center pt-12 border-t border-border/50">
-          <div className="flex flex-col items-center w-full">
-            <p className="text-xs font-bold text-muted-foreground mb-8 text-center tracking-[0.2em] uppercase opacity-70">
-              Quick Access Portals
-            </p>
-            
-            <motion.div 
-              variants={staggerContainerVariants}
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl"
-            >
-              {[
-                { 
-                  label: "Customer Login", 
-                  path: "/auth/customer/login", 
-                  icon: LogIn,
-                  bg: "hover:bg-cyan-500/10",
-                  border: "hover:border-cyan-500/30",
-                  text: "text-cyan-400"
-                },
-                { 
-                  label: "Verifier Login", 
-                  path: "/auth/verifier/login", 
-                  icon: ShieldCheck,
-                  bg: "hover:bg-emerald-500/10",
-                  border: "hover:border-emerald-500/30",
-                  text: "text-emerald-400"
-                },
-                { 
-                  label: "Create Account", 
-                  path: "/auth/customer/signup", 
-                  icon: UserPlus,
-                  bg: "hover:bg-violet-500/10",
-                  border: "hover:border-violet-500/30",
-                  text: "text-violet-400"
-                }
-              ].map((item) => (
-                <motion.button
-                  key={item.label}
-                  variants={staggerItemVariants}
-                  onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center gap-3 p-6 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/50 ${item.border} ${item.bg} ${twTransitions.base} group ${twTransitions.buttonHover}`}
-                >
-                  <div className={`p-3 rounded-xl bg-background/50 border border-border/50 group-hover:scale-110 ${twTransitions.base}`}>
-                    <item.icon className={`w-5 h-5 ${item.text}`} />
-                  </div>
-                  <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
-                    {item.label}
-                  </span>
-                </motion.button>
-              ))}
-            </motion.div>
+            {/* 3D Floating Card - Centered */}
+            <div className="mt-12 md:mt-16 h-[300px] md:h-[400px] w-full flex items-center justify-center">
+              <LumenCard3D />
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Scroll Indicator */}
+        <JumpingScroll />
+      </section>
+
+      {/* ==================== SECTION 2: FEATURES & TRUST (100vh) ==================== */}
+      <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-background via-primary/5 to-background border-y border-primary/10">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 relative z-[2]">
+
+          {/* Features */}
+          <div className="mb-20 relative">
+            <div className="text-center mb-12 md:mb-16 max-w-3xl mx-auto space-y-4">
+              <Typography.H2 className="text-3xl md:text-4xl lg:text-5xl">
+                Built on Web3 Standards
+              </Typography.H2>
+              <Typography.P>
+                Industry-leading technology stack ensuring security, privacy, and interoperability.
+              </Typography.P>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
+              {features.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <Card
+                    key={feature.title}
+                    className="border-2 border-border/50 bg-card/60 backdrop-blur-xl hover:border-primary/50 hover:shadow-2xl transition-all duration-300 group"
+                  >
+                    <CardContent className="p-8 text-center space-y-6">
+                      <div className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg ${feature.glow || ""} group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon size={40} className="text-white" aria-hidden="true" />
+                      </div>
+                      <div className="space-y-3">
+                        <Typography.H3 className="text-xl md:text-2xl">
+                          {feature.title}
+                        </Typography.H3>
+                        <Typography.P className="text-sm md:text-base">
+                          {feature.description}
+                        </Typography.P>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Trust Triangle */}
+          <div>
+            <div className="text-center mb-12 md:mb-16 max-w-3xl mx-auto space-y-4">
+              <Typography.H2 className="text-3xl md:text-4xl lg:text-5xl">
+                A Three-Party Trust Model
+              </Typography.H2>
+              <Typography.P>
+                Institutions issue credentials, individuals hold them securely, and employers verify instantly—all connected through blockchain trust.
+              </Typography.P>
+            </div>
+
+            <div className="flex justify-center">
+              <TrustTriangle size="lg" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== SECTION 3: GET STARTED (100vh) ==================== */}
+      <section className="min-h-screen relative flex items-center justify-center bg-gradient-to-b from-background to-primary/10">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 relative z-[2]">
+
+          {/* CTA Cards */}
+          <div className="mb-12 md:mb-16">
+            <div className="text-center mb-12 md:mb-16 max-w-3xl mx-auto space-y-4">
+              <Typography.H2 className="text-3xl md:text-4xl lg:text-5xl">
+                Get Started with LumenID
+              </Typography.H2>
+              <Typography.P>
+                Access your identity vault, verify credentials, or manage your organization's issues.
+              </Typography.P>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {roles.map((role) => {
+                const Icon = role.icon;
+                return (
+                  <Card
+                    key={role.title}
+                    className="border-2 border-border/50 hover:border-primary/50 transition-all duration-300 relative overflow-hidden group bg-card/60 backdrop-blur-xl hover:shadow-2xl"
+                  >
+                    {/* Gradient glow effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} rounded-lg blur-3xl opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+
+                    {/* Perfect Center Layout */}
+                    <div className="relative z-10 p-8 text-center space-y-8">
+
+                      {/* Icon */}
+                      <div className="flex justify-center">
+                        <div className={`w-24 h-24 bg-gradient-to-br ${role.gradient} rounded-3xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                          <Icon className="w-12 h-12 text-white" aria-hidden="true" />
+                        </div>
+                      </div>
+
+                      {/* Title & Subtitle */}
+                      <div className="space-y-3">
+                        <Typography.H3 className="text-2xl lg:text-3xl">
+                          {role.title}
+                        </Typography.H3>
+                        <p className="text-xs text-primary font-semibold uppercase tracking-wider">
+                          {role.subtitle}
+                        </p>
+                      </div>
+
+                      {/* Description */}
+                      <Typography.P className="text-sm md:text-base max-w-xs mx-auto">
+                        {role.description}
+                      </Typography.P>
+
+                      {/* Features */}
+                      <div className="space-y-3 max-w-xs mx-auto">
+                        {role.features.map((feature, index) => (
+                          <div key={index} className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                            <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Action Button */}
+                      <div className="pt-4">
+                        <Button
+                          onClick={() => navigate(role.path)}
+                          className={`w-full max-w-xs h-14 text-base bg-gradient-to-r ${role.gradient} hover:opacity-90 text-white border-0 shadow-xl group-hover:shadow-2xl transition-all group/btn`}
+                        >
+                          {role.buttonText}
+                          <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" aria-hidden="true" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Footer Tagline */}
+          <div className="text-center py-8 border-t border-border/30">
+            <Typography.Small className="text-muted-foreground">
+              Secured by Polygon • Verified by Blockchain • Trusted by Institutions
+            </Typography.Small>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

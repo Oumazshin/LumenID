@@ -1,107 +1,115 @@
-import { useNavigate } from "react-router";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { useNavigate, useLocation } from "react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import { HolderIcon, VerifierIcon, IssuerIcon } from "../icons/LumenIcons";
-import { twTransitions } from "../../styles/animations";
+import { Typography } from "../ui/typography";
+import { HolderIcon, IssuerIcon, VerifierIcon } from "../icons/LumenIcons";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ROUTES } from "../../constants/routes";
 
 export function RoleSelection() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Handle going back - always go to home
+  // Handle going back - always go to home page
   const handleGoBack = () => {
-    navigate("/");
+    navigate(ROUTES.HOME);
   };
 
   const roles = [
     {
-      type: "customer",
-      title: "General Customer",
-      description: "Students, Alumni, and Credential Holders",
-      icon: HolderIcon,
-      path: "/auth/customer/signup",
-      gradient: "from-cyan-500 via-blue-500 to-indigo-500",
-      iconBg: "from-cyan-500 to-blue-500",
+      title: "Organization",
+      description: "Issue and verify credentials with blockchain trust",
+      subtitle: "For Institutions",
+      icon: IssuerIcon,
+      gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
       features: [
-        "Create your digital identity profile",
-        "Store verifiable credentials securely",
-        "Share selective data with employers",
-        "Control access to your information"
-      ]
+        "Dashboard Access",
+        "Review Submissions",
+        "Approve Credentials",
+        "Manage Queue"
+      ],
+      path: ROUTES.AUTH.VERIFIER_LOGIN,
+      buttonText: "Admin Portal"
     },
     {
-      type: "verifier",
-      title: "Authorized Verifier",
-      description: "Employers, Institutions, and Organizations",
-      icon: VerifierIcon,
-      path: "/auth/verifier/login",
-      gradient: "from-emerald-500 via-teal-500 to-cyan-500",
-      iconBg: "from-emerald-500 to-teal-500",
+      title: "User",
+      description: "Store and manage digital credentials securely",
+      subtitle: "For Students",
+      icon: HolderIcon,
+      gradient: "from-cyan-500 via-blue-500 to-indigo-500",
       features: [
-        "Verify candidate credentials instantly",
-        "Check cryptographic proofs",
-        "Ensure data hasn't been tampered with",
-        "Request specific credential information"
-      ]
+        "Manage Profile",
+        "Receive Credentials",
+        "Zero-Knowledge Sharing",
+        "IPFS Portfolio"
+      ],
+      path: ROUTES.AUTH.CUSTOMER_LOGIN,
+      buttonText: "Access Vault",
+      secondaryButton: {
+        text: "Create Account",
+        path: ROUTES.AUTH.CUSTOMER_SIGNUP
+      }
+    },
+    {
+      title: "Relying Party",
+      description: "Instantly verify cryptographic credentials",
+      subtitle: "For Verifiers",
+      icon: VerifierIcon,
+      gradient: "from-emerald-500 via-teal-500 to-cyan-500",
+      features: [
+        "Zero-Trust Verification",
+        "On-Chain Integrity",
+        "One-Click Scanning",
+        "Instant Results"
+      ],
+      path: ROUTES.VERIFY,
+      buttonText: "Verify Credential"
     }
   ];
 
   return (
-    <div className="flex items-center justify-center py-8 md:py-16 relative">
-
-
-      <div className="w-full max-w-5xl space-y-12">
+    <div className="min-h-screen flex flex-col items-center justify-center py-16 px-4 relative">
+      <div className="max-w-7xl w-full space-y-12 px-4 sm:px-6 lg:px-8">
+        {/* Header - Centered */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-            Choose Your Path
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Select how you want to use LumenID. Your experience will be tailored to your specific needs and responsibilities.
-          </p>
+          <Typography.H1 className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Choose Your Role
+          </Typography.H1>
+          <Typography.P className="max-w-2xl mx-auto">
+            Select your primary account type to proceed with authentication.
+          </Typography.P>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {/* Role Cards - 3 Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {roles.map((role) => {
             const Icon = role.icon;
-            const roleStyles = {
-              customer: {
-                hoverBorder: "hover:border-cyan-500/50",
-                shadow: "shadow-cyan-500/20",
-              },
-              verifier: {
-                hoverBorder: "hover:border-emerald-500/50",
-                shadow: "shadow-emerald-500/20",
-              },
-            };
-            const styles = roleStyles[role.type];
             return (
-              <Card 
-                key={role.type}
-                className={`
-                  border border-border/50 bg-card/60 backdrop-blur-xl relative overflow-hidden group ${styles.hoverBorder} ${twTransitions.cardHover}
-                `}
+              <Card
+                key={role.title}
+                className="border-2 border-border/50 hover:border-primary/50 transition-all duration-300 group relative overflow-hidden bg-card/40 backdrop-blur-xl"
               >
-                {/* Background glow effect on hover */}
-                <div className={`absolute -inset-0.5 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-10 blur-xl ${twTransitions.slow}`} />
-                
-                <CardHeader className="relative z-10 p-8">
-                  <div className="flex items-center gap-5 mb-4">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.iconBg} flex items-center justify-center shadow-lg ${styles.shadow} shrink-0`}>
-                      <Icon size={32} className="text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-2xl mb-1">{role.title}</CardTitle>
-                      <CardDescription className="text-base">{role.description}</CardDescription>
-                    </div>
+                {/* Gradient glow effect */}
+                <div className={`absolute top-0 right-0 w-96 h-96 bg-gradient-to-br ${role.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none`} />
+
+                <CardHeader className="relative z-10 space-y-4 p-6 text-center">
+                  {/* Icon */}
+                  <div className={`w-14 h-14 bg-gradient-to-br ${role.gradient} rounded-2xl flex items-center justify-center shadow-lg mx-auto`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
+
+                  {/* Title and Description */}
+                  <div className="space-y-2">
+                    <Typography.H3 className="text-xl">{role.title}</Typography.H3>
+                    <Typography.Small className="text-muted-foreground uppercase tracking-wider">{role.subtitle}</Typography.Small>
                   </div>
 
                   {/* Features List */}
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">What You Can Do</h4>
-                    <ul className="space-y-3">
+                  <div className="space-y-3 pt-2">
+                    <ul className="space-y-2">
                       {role.features.map((feature, index) => (
-                        <li key={index} className="flex items-start gap-3 text-sm">
-                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${role.gradient} shrink-0 mt-2`} />
+                        <li key={index} className="flex items-start gap-2 text-sm justify-center">
+                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${role.gradient} flex-shrink-0 mt-2`} />
                           <span className="text-muted-foreground leading-relaxed">{feature}</span>
                         </li>
                       ))}
@@ -109,29 +117,38 @@ export function RoleSelection() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="relative z-10 p-8 pt-0">
+                <CardContent className="relative z-10 px-6 pb-6 pt-0 space-y-3 text-center">
                   <Button
                     onClick={() => navigate(role.path)}
-                    className={`w-full bg-gradient-to-r ${role.gradient} hover:opacity-90 text-white border-0 shadow-lg shadow-primary/20 h-12 text-base font-semibold group/btn ${twTransitions.buttonHover}`}
+                    className={`w-full max-w-xs mx-auto bg-gradient-to-r ${role.gradient} hover:opacity-90 text-white border-0 shadow-lg h-11 text-sm font-semibold group/btn transition-all`}
                   >
-                    Continue as {role.title}
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                    {role.buttonText || `Continue as ${role.title}`}
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
+                  {role.secondaryButton && (
+                    <Button
+                      onClick={() => navigate(role.secondaryButton.path)}
+                      variant="outline"
+                      className={`w-full max-w-xs mx-auto h-11 text-sm font-semibold hover:bg-secondary/50 transition-all`}
+                    >
+                      {role.secondaryButton.text}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );
           })}
         </div>
 
-        {/* Centralized Back Button */}
+        {/* Go Back Button - Centered Below Cards */}
         <div className="flex justify-center pt-4">
-          <Button 
+          <Button
+            variant="ghost"
             onClick={handleGoBack}
-            variant="ghost" 
-            className={`text-muted-foreground hover:text-foreground border-border/50 bg-white/5 backdrop-blur-xl rounded-2xl h-11 px-6 ${twTransitions.buttonHover}`}
+            className="gap-2 hover:bg-white/5 transition-all h-10 px-4 text-white/90 hover:text-white border border-white/10 hover:border-white/20"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
+            <ArrowLeft className="w-4 h-4" />
+            <span className="font-medium">Go Back</span>
           </Button>
         </div>
       </div>

@@ -6,8 +6,9 @@ export function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center py-12 md:py-24">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center space-y-8">
+        {/* 404 Visual */}
         <div className="relative">
           <div className="text-[12rem] md:text-[16rem] font-extrabold leading-none bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent opacity-20 select-none">
             404
@@ -19,6 +20,7 @@ export function NotFoundPage() {
           </div>
         </div>
 
+        {/* Content */}
         <div className="space-y-4 -mt-8">
           <h1 className="text-3xl md:text-4xl font-bold">Page Not Found</h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
@@ -26,6 +28,7 @@ export function NotFoundPage() {
           </p>
         </div>
 
+        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
           <Button
             size="lg"
@@ -46,30 +49,23 @@ export function NotFoundPage() {
           </Button>
         </div>
 
+        {/* Quick Links */}
         <div className="pt-8 border-t border-border/30">
           <p className="text-sm text-muted-foreground mb-4">Quick Links</p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm w-full max-w-md mx-auto">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/auth/customer/login")}
-              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <button
+              onClick={() => navigate("/auth/customer-login")}
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
             >
               Customer Login
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/auth/verifier/login")}
-              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10"
+            </button>
+            <span className="text-muted-foreground/40">•</span>
+            <button
+              onClick={() => navigate("/auth/verifier-login")}
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
             >
-              Verifier Login
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/auth/role-selection")}
-              className="flex-1 text-primary hover:text-primary/80 transition-colors font-medium hover:bg-primary/10 sm:col-span-2"
-            >
-              Get Started
-            </Button>
+              Verifier Portal
+            </button>
           </div>
         </div>
       </div>

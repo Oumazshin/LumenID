@@ -1,10 +1,10 @@
-// Removed Next.js directive for Vite
+"use client";
 
-import { useState } from "react";
+import { useTheme } from "next-themes";
 import { Toaster as Sonner } from "sonner";
 
 const Toaster = ({ ...props }) => {
-  const [theme] = useState("dark");
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
