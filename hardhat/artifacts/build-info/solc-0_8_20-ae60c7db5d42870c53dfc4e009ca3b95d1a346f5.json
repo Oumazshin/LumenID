@@ -1,0 +1,35 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_20-ae60c7db5d42870c53dfc4e009ca3b95d1a346f5",
+  "solcVersion": "0.8.20",
+  "solcLongVersion": "0.8.20+commit.a1b79de6",
+  "userSourceNameMap": {
+    "contracts/LumenIDRegistry.sol": "project/contracts/LumenIDRegistry.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/LumenIDRegistry.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\ncontract LumenIDRegistry {\r\n\r\n    struct Credential {\r\n        bytes32 claimsHash;\r\n        string  metadataURI;\r\n        string  recipientDID;\r\n        bool    isRevoked;\r\n    }\r\n\r\n    mapping(string => Credential) private credentials;\r\n    mapping(string => string)     private didDocuments;\r\n    address public owner;\r\n\r\n    event CredentialIssued(\r\n        string indexed credentialId,\r\n        string  recipientDID,\r\n        bytes32 claimsHash,\r\n        string  metadataURI\r\n    );\r\n\r\n    event CredentialRevoked(\r\n        string indexed credentialId,\r\n        string  reason\r\n    );\r\n\r\n    event DIDRegistered(\r\n        string indexed did,\r\n        string  docURI\r\n    );\r\n\r\n    modifier onlyOwner() {\r\n        require(msg.sender == owner, \"Not authorized\");\r\n        _;\r\n    }\r\n\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n    function issueCredential(\r\n        string  calldata credentialId,\r\n        string  calldata recipientDID,\r\n        bytes32          claimsHash,\r\n        string  calldata metadataURI\r\n    ) external onlyOwner {\r\n        credentials[credentialId] = Credential({\r\n            claimsHash:   claimsHash,\r\n            metadataURI:  metadataURI,\r\n            recipientDID: recipientDID,\r\n            isRevoked:    false\r\n        });\r\n        emit CredentialIssued(credentialId, recipientDID, claimsHash, metadataURI);\r\n    }\r\n\r\n    function revokeCredential(\r\n        string calldata credentialId,\r\n        string calldata reason\r\n    ) external onlyOwner {\r\n        require(credentials[credentialId].claimsHash != bytes32(0), \"Credential not found\");\r\n        credentials[credentialId].isRevoked = true;\r\n        emit CredentialRevoked(credentialId, reason);\r\n    }\r\n\r\n    function getCredential(string calldata credentialId)\r\n        external\r\n        view\r\n        returns (\r\n            bytes32 claimsHash,\r\n            string memory metadataURI,\r\n            string memory recipientDID,\r\n            bool isRevoked\r\n        )\r\n    {\r\n        Credential memory c = credentials[credentialId];\r\n        return (c.claimsHash, c.metadataURI, c.recipientDID, c.isRevoked);\r\n    }\r\n\r\n    function isRevoked(string calldata credentialId)\r\n        external\r\n        view\r\n        returns (bool)\r\n    {\r\n        return credentials[credentialId].isRevoked;\r\n    }\r\n\r\n    function registerDID(\r\n        string calldata did,\r\n        string calldata docURI\r\n    ) external onlyOwner {\r\n        didDocuments[did] = docURI;\r\n        emit DIDRegistered(did, docURI);\r\n    }\r\n\r\n    function resolveDID(string calldata did)\r\n        external\r\n        view\r\n        returns (string memory docURI)\r\n    {\r\n        return didDocuments[did];\r\n    }\r\n}"
+      }
+    }
+  }
+}
