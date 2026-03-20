@@ -38,7 +38,7 @@ export function BaseNavigation({
               aria-label={logo.ariaLabel || `Go to ${logo.text}`}
             >
               <motion.div
-                className={`relative w-10 h-10 bg-gradient-to-br ${logo.iconGradient} rounded-xl flex items-center justify-center shadow-lg`}
+                className={`relative w-12 h-12 bg-gradient-to-br ${logo.iconGradient} rounded-xl flex items-center justify-center shadow-lg`}
                 whileHover={{
                   scale: 1.05,
                   transition: { duration: 0.2 }

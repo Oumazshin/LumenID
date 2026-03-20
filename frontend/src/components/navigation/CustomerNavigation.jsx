@@ -81,7 +81,7 @@ export function CustomerNavigation() {
       logo={{
         to: ROUTES.CUSTOMER.DASHBOARD,
         icon: Vault,
-        image: <SiteLogo width={36} height={36} className="rounded" />,
+        image: <SiteLogo width={48} height={48} className="rounded" />,
         iconGradient: "from-cyan-500 via-blue-500 to-indigo-500",
         text: "LumenID",
         textGradient: "from-cyan-400 via-blue-400 to-indigo-400",

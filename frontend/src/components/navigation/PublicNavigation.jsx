@@ -32,7 +32,7 @@ export function PublicNavigation() {
       logo={{
         to: "/",
         icon: Wallet,
-        image: <SiteLogo width={36} height={36} className="rounded" />,
+        image: <SiteLogo width={48} height={48} className="rounded" />,
         iconGradient: "from-violet-500 via-purple-500 to-fuchsia-500",
         text: "LumenID",
         textGradient: "from-cyan-400 via-purple-400 to-pink-400",

@@ -5,8 +5,8 @@
  * sized freely via width / height props while preserving aspect ratio.
  */
 export function SiteLogo({
-  width = 40,
-  height = 40,
+  width = 56,
+  height = 56,
   className = "",
   alt = "LumenID Logo",
   ...rest

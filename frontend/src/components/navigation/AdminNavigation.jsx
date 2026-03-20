@@ -68,7 +68,7 @@ export function AdminNavigation() {
       logo={{
         to: ROUTES.ADMIN.DASHBOARD,
         icon: LayoutDashboard,
-        image: <SiteLogo width={36} height={36} className="rounded" />,
+        image: <SiteLogo width={48} height={48} className="rounded" />,
         iconGradient: "from-emerald-500 via-teal-500 to-cyan-500",
         text: "LumenID Admin",
         textGradient: "from-emerald-400 via-teal-400 to-cyan-400",
