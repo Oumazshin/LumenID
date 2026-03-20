@@ -3,6 +3,7 @@ import { LayoutDashboard, Vault, UserCircle, LogOut } from "lucide-react";
 import { NavButton, MobileNavButton, BaseNavigation } from "./BaseNavigation";
 import { useAuthNavigation } from "../../hooks/useAuthNavigation";
 import { ROUTES } from "../../constants/routes";
+import { SiteLogo } from "../ui/SiteLogo";
 
 export function CustomerNavigation() {
   const location = useLocation();
@@ -80,6 +81,7 @@ export function CustomerNavigation() {
       logo={{
         to: ROUTES.CUSTOMER.DASHBOARD,
         icon: Vault,
+        image: <SiteLogo width={36} height={36} className="rounded" />,
         iconGradient: "from-cyan-500 via-blue-500 to-indigo-500",
         text: "LumenID",
         textGradient: "from-cyan-400 via-blue-400 to-indigo-400",

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router";
 import { ArrowRight, Shield, Award, CheckCircle2 } from "lucide-react";
+import { SiteLogo } from "./ui/SiteLogo";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import {
@@ -279,6 +280,9 @@ export function LandingPage() {
 
           {/* Footer Tagline */}
           <div className="text-center py-8 border-t border-border/30">
+            <div className="flex justify-center mb-3">
+              <SiteLogo width={40} height={40} />
+            </div>
             <Typography.Small className="text-muted-foreground">
               Secured by Polygon • Verified by Blockchain • Trusted by Institutions
             </Typography.Small>

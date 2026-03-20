@@ -48,7 +48,7 @@ export function BaseNavigation({
                   transition: { duration: 0.1 }
                 }}
               >
-                <Icon className="w-5 h-5 text-white" aria-hidden="true" />
+                {logo.image ? logo.image : <Icon className="w-5 h-5 text-white" aria-hidden="true" />}
               </motion.div>
               <span className={`font-bold text-xl bg-gradient-to-r ${logo.textGradient} bg-clip-text text-transparent whitespace-nowrap`}>
                 {logo.text}

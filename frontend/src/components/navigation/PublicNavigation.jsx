@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router";
 import { Wallet, ArrowLeft } from "lucide-react";
 import { BaseNavigation } from "./BaseNavigation";
+import { SiteLogo } from "../ui/SiteLogo";
 
 export function PublicNavigation() {
   const location = useLocation();
@@ -31,6 +32,7 @@ export function PublicNavigation() {
       logo={{
         to: "/",
         icon: Wallet,
+        image: <SiteLogo width={36} height={36} className="rounded" />,
         iconGradient: "from-violet-500 via-purple-500 to-fuchsia-500",
         text: "LumenID",
         textGradient: "from-cyan-400 via-purple-400 to-pink-400",
