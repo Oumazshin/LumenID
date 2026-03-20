@@ -284,7 +284,7 @@ export function LandingPage() {
               <SiteLogo width={40} height={40} />
             </div>
             <Typography.Small className="text-muted-foreground">
-              Secured by Polygon • Verified by Blockchain • Trusted by Institutions
+              Secured by Polkadot • Verified by Blockchain • Trusted by Institutions
             </Typography.Small>
           </div>
         </div>
